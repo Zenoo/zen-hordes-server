@@ -1,35 +1,47 @@
 import { Router, Request, Response } from 'express';
 import { createMHApi } from '../utils/mh-api.helper';
 import { z } from 'zod';
+import { registry } from '../utils/openapi';
+import { routeDetails, ErrorResponse } from '../utils/openapi-schemas';
 
-/**
- * Schema for /update POST request body
- */
-export const updateRequestSchema = z.object({
-  userkey: z.string().min(1, 'userkey is required'),
+const requestSchema = registry.register(
+  'UpdateRequest',
+  z.object({
+    userkey: z.string().min(1).openapi({ description: 'User key for MyHordes API authentication' }),
+  })
+);
+
+const responseSchema = registry.register(
+  'UpdateResponse',
+  z.object({
+    available: z.boolean().openapi({ description: 'MyHordes API status' }),
+  })
+);
+
+type ResponseType = z.infer<typeof responseSchema>;
+
+registry.registerPath({
+  method: 'post',
+  path: '/update',
+  summary: 'Get API status',
+  tags: ['Update'],
+  ...routeDetails(requestSchema, responseSchema),
 });
-
-/**
- * Type inferred from the Zod schema
- */
-export type UpdateRequest = z.infer<typeof updateRequestSchema>;
 
 const router = Router();
 
-// POST /update endpoint
-router.post('/', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse>) => {
   try {
-    // Validate request body
-    const validationResult = updateRequestSchema.safeParse(req.body);
-    
+    const validationResult = requestSchema.safeParse(req.body);
+
     if (!validationResult.success) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Validation failed',
-        details: validationResult.error.issues
+        details: validationResult.error.issues,
       });
     }
 
-    const { userkey }: UpdateRequest = validationResult.data;
+    const { userkey } = validationResult.data;
 
     // Initialize MH API with credentials
     const api = createMHApi(userkey);
@@ -38,13 +50,13 @@ router.post('/', async (req: Request, res: Response) => {
     const { data } = await api.json.statusList();
 
     const available = !data.attack && !data.maintain;
-    
+
     res.json({ available });
   } catch (error) {
     console.error('Error fetching API status:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch API status',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });

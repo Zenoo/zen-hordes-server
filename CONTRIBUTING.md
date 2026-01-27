@@ -1,6 +1,7 @@
 # Release Please and Commit Message Enforcement
 
 This project uses:
+
 - **[Release Please](https://github.com/googleapis/release-please)** for automated releases
 - **[Commitlint](https://commitlint.js.org/)** for commit message validation
 - **[Husky](https://typicode.github.io/husky/)** for git hooks
@@ -53,6 +54,7 @@ BREAKING CHANGE: The API endpoint structure has been completely redesigned.
 ## Release Process
 
 Release Please will automatically:
+
 1. Create a release PR when commits are pushed to `main`
 2. Update the CHANGELOG
 3. Bump the version number

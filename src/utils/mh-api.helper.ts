@@ -5,7 +5,7 @@ import { Api } from './MHApi';
  */
 export const createMHApi = (userkey: string): Api<unknown> => {
   const api = new Api({
-    baseUrl: "https://myhordes.eu/api/x",
+    baseUrl: 'https://myhordes.eu/api/x',
   });
 
   api.setSecurityData({

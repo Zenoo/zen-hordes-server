@@ -30,6 +30,7 @@ pnpm install
 ## Configuration
 
 1. Copy the environment variables example:
+
    ```bash
    cp .env.example .env
    ```
@@ -57,34 +58,24 @@ The server will start on `http://localhost:3000` with hot-reload enabled.
 - `pnpm start` - Start the production server
 - `pnpm test:update` - Test the `/update` endpoint
 - `pnpm mh-api:generate` - Regenerate MyHordes API types
+- `pnpm openapi:generate` - Generate OpenAPI specification file
 
-## API Endpoints
+## API Documentation
 
-### POST `/update`
+Interactive API documentation is available at `/swagger` when the server is running.
 
-Fetches the current API status from MyHordes.
+Visit `http://localhost:3000/swagger` to explore the API endpoints, request/response schemas, and test the API directly from your browser.
 
-**Request Body:**
-```json
-{
-  "userkey": "your_user_key"
-}
+You can also generate an `openapi.json` file:
+
+```bash
+pnpm openapi:generate
 ```
-
-**Response:**
-```json
-{
-  "available": true
-}
-```
-
-**Error Responses:**
-- `400` - Validation error (invalid or missing userkey)
-- `500` - Server error
 
 ## Testing the API
 
 1. Copy the test body example:
+
    ```bash
    cp scripts/update-body.json.example scripts/update-body.json
    ```
