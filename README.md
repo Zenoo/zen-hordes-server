@@ -6,8 +6,10 @@ Server for the Zen Hordes browser extension. This server acts as a backend to in
 
 - ✅ Type-safe API with TypeScript
 - ✅ Request validation using Zod
-- ✅ MyHordes API integration
+- ✅ Auto-generated OpenAPI/Swagger documentation from Zod schemas
+- ✅ MyHordes API integration with generated types
 - ✅ Express-based REST API
+- ✅ ESLint + Prettier with pre-commit hooks
 - ✅ Automated releases with Release Please
 - ✅ Conventional commit enforcement
 
@@ -57,6 +59,9 @@ The server will start on `http://localhost:3000` with hot-reload enabled.
 - `pnpm build` - Build the project for production
 - `pnpm start` - Start the production server
 - `pnpm test:update` - Test the `/update` endpoint
+- `pnpm lint` - Run ESLint to check code quality
+- `pnpm lint:fix` - Auto-fix ESLint issues
+- `pnpm format` - Format code with Prettier
 - `pnpm mh-api:generate` - Regenerate MyHordes API types
 - `pnpm openapi:generate` - Generate OpenAPI specification file
 
@@ -91,13 +96,20 @@ pnpm openapi:generate
 
 ```
 zen-hordes-server/
-├── .github/              # GitHub configuration (workflows, copilot instructions)
+├── .github/
+│   ├── workflows/        # GitHub Actions (Release Please)
+│   └── copilot-instructions.md
+├── .husky/               # Git hooks (commit-msg, pre-commit)
 ├── scripts/              # Shell scripts for development tasks
 ├── src/
 │   ├── routes/           # API route handlers
 │   ├── utils/            # Utility functions and helpers
 │   └── index.ts          # Main server file
+├── .vscode/              # VS Code settings (format on save)
 ├── .env.example          # Environment variables template
+├── commitlint.config.mjs # Commit message linting config
+├── eslint.config.mjs     # ESLint configuration
+├── .prettierrc           # Prettier configuration
 ├── CONTRIBUTING.md       # Contribution guidelines
 └── README.md             # This file
 ```
