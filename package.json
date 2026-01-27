@@ -9,7 +9,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test:update": "sh scripts/test-update.sh"
+    "test:update": "sh scripts/test-update.sh",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "Zenoo",
@@ -25,8 +26,11 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.10",
+    "husky": "^9.1.7",
     "swagger-typescript-api": "^13.2.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
