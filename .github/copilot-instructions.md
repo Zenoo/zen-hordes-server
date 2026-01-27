@@ -17,6 +17,8 @@
 - **Never use the `any` type**. All code must be fully type-safe.
 - Use proper TypeScript types, interfaces, or type inference.
 - If the type is complex or unknown, use `unknown` and perform type guards/validation.
+- **Never use non-null assertions (`!`)**. Use proper null checks or optional chaining instead.
+- Prefer explicit type guards and validation over type assertions.
 
 ### Performance
 

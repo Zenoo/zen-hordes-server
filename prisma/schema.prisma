@@ -1,0 +1,156 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ENUMS
+enum Locale {
+  EN
+  FR
+  ES
+  DE
+}
+
+enum TownPhase {
+  ALPHA
+  BETA
+  IMPORT
+  NATIVE
+}
+
+enum TownType {
+  SMALL
+  REMOTE
+  PANDEMONIUM
+  CUSTOM
+}
+
+enum Job {
+  RESIDENT
+  GUARDIAN
+  SCAVENGER
+  SCOUT
+  SURVIVALIST
+  TAMER
+  TECHNICIAN
+}
+
+// MODELS
+model User {
+  id         Int       @id
+  twinoidId  Int?
+  etwinId    String?
+  name       String
+  locale     Locale    @default(EN)
+  avatar     String?
+  lastUpdate DateTime?
+
+  guideTowns          Town[]    @relation("GuideTowns")
+  shamanTowns         Town[]    @relation("ShamanTowns")
+  catapultMasterTowns Town[]    @relation("CatapultMasterTowns")
+  zonesUpdated        Zone[]
+  citizenInTowns      Citizen[]
+}
+
+model BankItem {
+  town     Town    @relation(fields: [townId], references: [id])
+  townId   Int
+  id       Int
+  broken   Boolean @default(false)
+  quantity Int     @default(1)
+
+  @@id([townId, id, broken])
+}
+
+model ZoneItem {
+  zone     Zone    @relation(fields: [townId, x, y], references: [townId, x, y])
+  town     Town    @relation(fields: [townId], references: [id])
+  townId   Int
+  x        Int
+  y        Int
+  id       Int
+  broken   Boolean @default(false)
+  quantity Int     @default(1)
+
+  @@id([townId, x, y, id, broken])
+}
+
+model Zone {
+  town   Town @relation(fields: [townId], references: [id])
+  townId Int
+  x      Int
+  y      Int
+
+  visitedToday Boolean @default(false)
+  dangerLevel  Int     @default(0)
+  buildingId   Int?
+
+  // Data only updated when a user visits the zone
+  depleted    Boolean    @default(false)
+  zombies     Int        @default(0)
+  items       ZoneItem[]
+  updatedAt   DateTime?
+  updatedBy   User?      @relation(fields: [updatedById], references: [id])
+  updatedById Int?
+
+  @@id([townId, x, y])
+}
+
+model Citizen {
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  town   Town @relation(fields: [townId], references: [id])
+  townId Int
+
+  job    Job?
+  x      Int
+  y      Int
+  dead   Boolean @default(false)
+  out    Boolean @default(false)
+  banned Boolean @default(false)
+
+  @@id([userId, townId])
+}
+
+model Town {
+  id     Int       @id
+  name   String
+  start  DateTime
+  season Int
+  phase  TownPhase
+  source String?
+
+  width       Int
+  height      Int
+  x           Int
+  y           Int
+  bonusPoints Int @default(0)
+
+  waterInWell Int       @default(0)
+  type        TownType
+  lastUpdate  DateTime?
+
+  insurrected Boolean @default(false)
+  custom      Boolean @default(false)
+  chaos       Boolean @default(false)
+  devastated  Boolean @default(false)
+  doorOpened  Boolean @default(false)
+  pandemonium Boolean @default(false)
+
+  guide            User? @relation("GuideTowns", fields: [guideId], references: [id])
+  guideId          Int?
+  shaman           User? @relation("ShamanTowns", fields: [shamanId], references: [id])
+  shamanId         Int?
+  catapultMaster   User? @relation("CatapultMasterTowns", fields: [catapultMasterId], references: [id])
+  catapultMasterId Int?
+
+  zones     Zone[]
+  bank      BankItem[]
+  zoneItems ZoneItem[]
+  citizens  Citizen[]
+}

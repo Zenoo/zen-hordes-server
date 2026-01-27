@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import '../src/routes/update.route'; // Import to register routes
-import { generateOpenApiDocument } from '../src/utils/openapi';
+import { generateOpenApiDocument } from '../src/utils/api/openapi';
 
 const openApiDocument = generateOpenApiDocument();
 

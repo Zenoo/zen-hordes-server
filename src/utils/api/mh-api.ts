@@ -39,20 +39,20 @@ export interface XMLUserResponse {
      * @format datetime
      * @example "2022-07-16 20:00:00"
      */
-    "cache-date"?: string;
+    'cache-date'?: string;
     /**
      * Will usually be 0.
      * @min 0
      * @max 0
      * @example 0
      */
-    "cache-fast"?: number;
+    'cache-fast'?: number;
     /** List of pictos */
     rewards?: XMLRewardListObject;
     /** List of maps */
     maps?: XMLMapListObject;
     /** List of imported maps (imported into MyHordes, but for the primary soul) */
-    "imported-maps"?: XMLImportedMapListObject;
+    'imported-maps'?: XMLImportedMapListObject;
   };
 }
 
@@ -66,14 +66,14 @@ export interface XMLItemResponse {
      * @format datetime
      * @example "2022-07-16 20:00:00"
      */
-    "cache-date"?: string;
+    'cache-date'?: string;
     /**
      * Will usually be 0.
      * @min 0
      * @max 0
      * @example 0
      */
-    "cache-fast"?: number;
+    'cache-fast'?: number;
     /** List of item types available on MyHordes */
     items?: XMLItemPrototypeListObject;
   };
@@ -89,14 +89,14 @@ export interface XMLBuildingResponse {
      * @format datetime
      * @example "2022-07-16 20:00:00"
      */
-    "cache-date"?: string;
+    'cache-date'?: string;
     /**
      * Will usually be 0.
      * @min 0
      * @max 0
      * @example 0
      */
-    "cache-fast"?: number;
+    'cache-fast'?: number;
     /** List of construction sites available on MyHordes */
     items?: XMLBuildingPrototypeListObject;
   };
@@ -112,14 +112,14 @@ export interface XMLRuinResponse {
      * @format datetime
      * @example "2022-07-16 20:00:00"
      */
-    "cache-date"?: string;
+    'cache-date'?: string;
     /**
      * Will usually be 0.
      * @min 0
      * @max 0
      * @example 0
      */
-    "cache-fast"?: number;
+    'cache-fast'?: number;
     /** List of ruins that can spawn on MyHordes */
     items?: XMLRuinPrototypeListObject;
   };
@@ -135,14 +135,14 @@ export interface XMLPictoResponse {
      * @format datetime
      * @example "2022-07-16 20:00:00"
      */
-    "cache-date"?: string;
+    'cache-date'?: string;
     /**
      * Will usually be 0.
      * @min 0
      * @max 0
      * @example 0
      */
-    "cache-fast"?: number;
+    'cache-fast'?: number;
     /** List of pictos that can be obtained on MyHordes */
     items?: XMLPictoPrototypeListObject;
   };
@@ -158,14 +158,14 @@ export interface XMLTownResponse {
      * @format datetime
      * @example "2022-07-16 20:00:00"
      */
-    "cache-date"?: string;
+    'cache-date'?: string;
     /**
      * Will usually be 0.
      * @min 0
      * @max 0
      * @example 0
      */
-    "cache-fast"?: number;
+    'cache-fast'?: number;
     /** City details */
     city?: XMLCityObject;
     /** Town bank */
@@ -223,16 +223,7 @@ export interface XMLCitizenObject {
    * Job identifier
    * @example "collec"
    */
-  job?:
-    | "none"
-    | "basic"
-    | "collec"
-    | "guardian"
-    | "hunter"
-    | "tamer"
-    | "tech"
-    | "shaman"
-    | "survivalist";
+  job?: 'none' | 'basic' | 'collec' | 'guardian' | 'hunter' | 'tamer' | 'tech' | 'shaman' | 'survivalist';
   /**
    * Is this citizen outside (1) or in town (0)
    * @min 0
@@ -316,15 +307,7 @@ export interface XMLItemObject {
    * Item category
    * @example "Rsc"
    */
-  cat?:
-    | "Armor"
-    | "Box"
-    | "Drug"
-    | "Food"
-    | "Furniture"
-    | "Misc"
-    | "Rsc"
-    | "Weapon";
+  cat?: 'Armor' | 'Box' | 'Drug' | 'Food' | 'Furniture' | 'Misc' | 'Rsc' | 'Weapon';
   /**
    * Item icon
    * @example "item/item_pile.gif"
@@ -426,7 +409,7 @@ export interface XMLHeaderObject {
    * Current language
    * @example "de"
    */
-  language?: "de" | "en" | "fr" | "es";
+  language?: 'de' | 'en' | 'fr' | 'es';
   /**
    * API version
    * @example "0.1"
@@ -556,12 +539,12 @@ export interface XMLMapObject {
    * Origin of an imported town
    * @example "de"
    */
-  origin?: "de" | "en" | "fr" | "es";
+  origin?: 'de' | 'en' | 'fr' | 'es';
   /**
    * Describes the origin of the town.
    * @example "alpha"
    */
-  phase?: "alpha" | "beta" | "native" | "import";
+  phase?: 'alpha' | 'beta' | 'native' | 'import';
 }
 
 /** List of maps */
@@ -585,15 +568,7 @@ export interface XMLItemPrototypeObject {
    * Item category
    * @example "Rsc"
    */
-  cat?:
-    | "Armor"
-    | "Box"
-    | "Drug"
-    | "Food"
-    | "Furniture"
-    | "Misc"
-    | "Rsc"
-    | "Weapon";
+  cat?: 'Armor' | 'Box' | 'Drug' | 'Food' | 'Furniture' | 'Misc' | 'Rsc' | 'Weapon';
   /**
    * Item icon
    * @example "item/item_pile.gif"
@@ -754,7 +729,7 @@ export interface XMLCityObject {
    * Specific town type
    * @example "remote"
    */
-  type?: "small" | "remote" | "panda" | "custom";
+  type?: 'small' | 'remote' | 'panda' | 'custom';
   /**
    * Town position on the map (x)
    * @example 16
@@ -784,7 +759,7 @@ export interface XMLCityObject {
    * City language
    * @example "de"
    */
-  region?: "de" | "en" | "fr" | "es";
+  region?: 'de' | 'en' | 'fr' | 'es';
   /** Town defense details */
   defense?: {
     /**
@@ -966,10 +941,7 @@ export interface JSONServerStatusResponse {
 }
 
 /** List of item types known to the server. */
-export type JSONPrototypeItemsResponse = Record<
-  string,
-  JSONItemPrototypeObject
->;
+export type JSONPrototypeItemsResponse = Record<string, JSONItemPrototypeObject>;
 
 /** Localizable string */
 export type JSONLanguageDependantField =
@@ -1321,7 +1293,7 @@ export interface JSONPictoObject {
      * Title or icon unlock? If icon, the icon path is contained in value.
      * @example "title"
      */
-    type?: "title" | "icon";
+    type?: 'title' | 'icon';
     /** Localizable string */
     value?: JSONLanguageDependantField;
   }[];
@@ -1355,7 +1327,7 @@ export interface JSONMapObject {
    * Specific town type
    * @example "remote"
    */
-  type?: "small" | "remote" | "panda" | "custom";
+  type?: 'small' | 'remote' | 'panda' | 'custom';
   /**
    * True if this is a pandemonium town
    * @example false
@@ -1752,7 +1724,7 @@ export interface JSONGameObject {
      * Specific town type
      * @example "remote"
      */
-    type?: "small" | "remote" | "panda" | "custom";
+    type?: 'small' | 'remote' | 'panda' | 'custom';
     /**
      * Town position on the map (x)
      * @example 16
@@ -1992,9 +1964,9 @@ export interface JSONGameObject {
 }
 
 export type QueryParamsType = Record<string | number, any>;
-export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
+export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
 
-export interface FullRequestParams extends Omit<RequestInit, "body"> {
+export interface FullRequestParams extends Omit<RequestInit, 'body'> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -2013,22 +1985,16 @@ export interface FullRequestParams extends Omit<RequestInit, "body"> {
   cancelToken?: CancelToken;
 }
 
-export type RequestParams = Omit<
-  FullRequestParams,
-  "body" | "method" | "query" | "path"
->;
+export type RequestParams = Omit<FullRequestParams, 'body' | 'method' | 'query' | 'path'>;
 
 export interface ApiConfig<SecurityDataType = unknown> {
   baseUrl?: string;
-  baseApiParams?: Omit<RequestParams, "baseUrl" | "cancelToken" | "signal">;
-  securityWorker?: (
-    securityData: SecurityDataType | null,
-  ) => Promise<RequestParams | void> | RequestParams | void;
+  baseApiParams?: Omit<RequestParams, 'baseUrl' | 'cancelToken' | 'signal'>;
+  securityWorker?: (securityData: SecurityDataType | null) => Promise<RequestParams | void> | RequestParams | void;
   customFetch?: typeof fetch;
 }
 
-export interface HttpResponse<D extends unknown, E extends unknown = unknown>
-  extends Response {
+export interface HttpResponse<D extends unknown, E extends unknown = unknown> extends Response {
   data: D;
   error: E;
 }
@@ -2036,26 +2002,25 @@ export interface HttpResponse<D extends unknown, E extends unknown = unknown>
 type CancelToken = Symbol | string | number;
 
 export enum ContentType {
-  Json = "application/json",
-  JsonApi = "application/vnd.api+json",
-  FormData = "multipart/form-data",
-  UrlEncoded = "application/x-www-form-urlencoded",
-  Text = "text/plain",
+  Json = 'application/json',
+  JsonApi = 'application/vnd.api+json',
+  FormData = 'multipart/form-data',
+  UrlEncoded = 'application/x-www-form-urlencoded',
+  Text = 'text/plain',
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "/api/x/";
+  public baseUrl: string = '/api/x/';
   private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
+  private securityWorker?: ApiConfig<SecurityDataType>['securityWorker'];
   private abortControllers = new Map<CancelToken, AbortController>();
-  private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
-    fetch(...fetchParams);
+  private customFetch = (...fetchParams: Parameters<typeof fetch>) => fetch(...fetchParams);
 
   private baseApiParams: RequestParams = {
-    credentials: "same-origin",
+    credentials: 'same-origin',
     headers: {},
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer',
   };
 
   constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
@@ -2068,7 +2033,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   protected encodeQueryParam(key: string, value: any) {
     const encodedKey = encodeURIComponent(key);
-    return `${encodedKey}=${encodeURIComponent(typeof value === "number" ? value : `${value}`)}`;
+    return `${encodedKey}=${encodeURIComponent(typeof value === 'number' ? value : `${value}`)}`;
   }
 
   protected addQueryParam(query: QueryParamsType, key: string) {
@@ -2077,41 +2042,28 @@ export class HttpClient<SecurityDataType = unknown> {
 
   protected addArrayQueryParam(query: QueryParamsType, key: string) {
     const value = query[key];
-    return value.map((v: any) => this.encodeQueryParam(key, v)).join("&");
+    return value.map((v: any) => this.encodeQueryParam(key, v)).join('&');
   }
 
   protected toQueryString(rawQuery?: QueryParamsType): string {
     const query = rawQuery || {};
-    const keys = Object.keys(query).filter(
-      (key) => "undefined" !== typeof query[key],
-    );
+    const keys = Object.keys(query).filter((key) => 'undefined' !== typeof query[key]);
     return keys
-      .map((key) =>
-        Array.isArray(query[key])
-          ? this.addArrayQueryParam(query, key)
-          : this.addQueryParam(query, key),
-      )
-      .join("&");
+      .map((key) => (Array.isArray(query[key]) ? this.addArrayQueryParam(query, key) : this.addQueryParam(query, key)))
+      .join('&');
   }
 
   protected addQueryParams(rawQuery?: QueryParamsType): string {
     const queryString = this.toQueryString(rawQuery);
-    return queryString ? `?${queryString}` : "";
+    return queryString ? `?${queryString}` : '';
   }
 
   private contentFormatters: Record<ContentType, (input: any) => any> = {
     [ContentType.Json]: (input: any) =>
-      input !== null && (typeof input === "object" || typeof input === "string")
-        ? JSON.stringify(input)
-        : input,
+      input !== null && (typeof input === 'object' || typeof input === 'string') ? JSON.stringify(input) : input,
     [ContentType.JsonApi]: (input: any) =>
-      input !== null && (typeof input === "object" || typeof input === "string")
-        ? JSON.stringify(input)
-        : input,
-    [ContentType.Text]: (input: any) =>
-      input !== null && typeof input !== "string"
-        ? JSON.stringify(input)
-        : input,
+      input !== null && (typeof input === 'object' || typeof input === 'string') ? JSON.stringify(input) : input,
+    [ContentType.Text]: (input: any) => (input !== null && typeof input !== 'string' ? JSON.stringify(input) : input),
     [ContentType.FormData]: (input: any) => {
       if (input instanceof FormData) {
         return input;
@@ -2123,9 +2075,9 @@ export class HttpClient<SecurityDataType = unknown> {
           key,
           property instanceof Blob
             ? property
-            : typeof property === "object" && property !== null
+            : typeof property === 'object' && property !== null
               ? JSON.stringify(property)
-              : `${property}`,
+              : `${property}`
         );
         return formData;
       }, new FormData());
@@ -2133,10 +2085,7 @@ export class HttpClient<SecurityDataType = unknown> {
     [ContentType.UrlEncoded]: (input: any) => this.toQueryString(input),
   };
 
-  protected mergeRequestParams(
-    params1: RequestParams,
-    params2?: RequestParams,
-  ): RequestParams {
+  protected mergeRequestParams(params1: RequestParams, params2?: RequestParams): RequestParams {
     return {
       ...this.baseApiParams,
       ...params1,
@@ -2149,9 +2098,7 @@ export class HttpClient<SecurityDataType = unknown> {
     };
   }
 
-  protected createAbortSignal = (
-    cancelToken: CancelToken,
-  ): AbortSignal | undefined => {
+  protected createAbortSignal = (cancelToken: CancelToken): AbortSignal | undefined => {
     if (this.abortControllers.has(cancelToken)) {
       const abortController = this.abortControllers.get(cancelToken);
       if (abortController) {
@@ -2192,7 +2139,7 @@ export class HttpClient<SecurityDataType = unknown> {
     };
 
     const secureParams =
-      ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
+      ((typeof secure === 'boolean' ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
         (await this.securityWorker(this.securityData))) ||
       {};
@@ -2201,26 +2148,15 @@ export class HttpClient<SecurityDataType = unknown> {
     const payloadFormatter = this.contentFormatters[type || ContentType.Json];
     const responseFormat = format || requestParams.format;
 
-    return this.customFetch(
-      `${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`,
-      {
-        ...requestParams,
-        headers: {
-          ...(requestParams.headers || {}),
-          ...(type && type !== ContentType.FormData
-            ? { "Content-Type": type }
-            : {}),
-        },
-        signal:
-          (cancelToken
-            ? this.createAbortSignal(cancelToken)
-            : requestParams.signal) || null,
-        body:
-          typeof body === "undefined" || body === null
-            ? null
-            : payloadFormatter(body),
+    return this.customFetch(`${baseUrl || this.baseUrl || ''}${path}${queryString ? `?${queryString}` : ''}`, {
+      ...requestParams,
+      headers: {
+        ...(requestParams.headers || {}),
+        ...(type && type !== ContentType.FormData ? { 'Content-Type': type } : {}),
       },
-    ).then(async (response) => {
+      signal: (cancelToken ? this.createAbortSignal(cancelToken) : requestParams.signal) || null,
+      body: typeof body === 'undefined' || body === null ? null : payloadFormatter(body),
+    }).then(async (response) => {
       const r = response as HttpResponse<T, E>;
       r.data = null as unknown as T;
       r.error = null as unknown as E;
@@ -2260,9 +2196,7 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * This documentation describes the MyHordes external API. There are two APIs available to use - JSON and XML. Although it's possible to mix them, this is not recommended.
  */
-export class Api<
-  SecurityDataType extends unknown,
-> extends HttpClient<SecurityDataType> {
+export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   v2 = {
     /**
      * No description
@@ -2277,7 +2211,7 @@ export class Api<
     getV2: (params: RequestParams = {}) =>
       this.request<XMLEndpointList, any>({
         path: `/v2/xml`,
-        method: "GET",
+        method: 'GET',
         secure: true,
         ...params,
       }),
@@ -2295,7 +2229,7 @@ export class Api<
     xmlUserList: (params: RequestParams = {}) =>
       this.request<XMLUserResponse, any>({
         path: `/v2/xml/user`,
-        method: "GET",
+        method: 'GET',
         secure: true,
         ...params,
       }),
@@ -2313,7 +2247,7 @@ export class Api<
     xmlItemsList: (params: RequestParams = {}) =>
       this.request<XMLItemResponse, any>({
         path: `/v2/xml/items`,
-        method: "GET",
+        method: 'GET',
         secure: true,
         ...params,
       }),
@@ -2331,7 +2265,7 @@ export class Api<
     xmlBuildingsList: (params: RequestParams = {}) =>
       this.request<XMLBuildingResponse, any>({
         path: `/v2/xml/buildings`,
-        method: "GET",
+        method: 'GET',
         secure: true,
         ...params,
       }),
@@ -2349,7 +2283,7 @@ export class Api<
     xmlRuinsList: (params: RequestParams = {}) =>
       this.request<XMLRuinResponse, any>({
         path: `/v2/xml/ruins`,
-        method: "GET",
+        method: 'GET',
         secure: true,
         ...params,
       }),
@@ -2367,7 +2301,7 @@ export class Api<
     xmlPictosList: (params: RequestParams = {}) =>
       this.request<XMLPictoResponse, any>({
         path: `/v2/xml/pictos`,
-        method: "GET",
+        method: 'GET',
         secure: true,
         ...params,
       }),
@@ -2389,11 +2323,11 @@ export class Api<
         /** Set true to allow the data node to be rendered from a cache. Speeds up response time. */
         cache?: boolean;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<XMLTownResponse, any>({
         path: `/v2/xml/town`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
         ...params,
@@ -2412,8 +2346,8 @@ export class Api<
     statusList: (params: RequestParams = {}) =>
       this.request<JSONServerStatusResponse, any>({
         path: `/json/status`,
-        method: "GET",
-        format: "json",
+        method: 'GET',
+        format: 'json',
         ...params,
       }),
 
@@ -2436,14 +2370,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONPrototypeItemsResponse, any>({
         path: `/json/items`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2466,14 +2400,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONBuildingPrototypeObject, any>({
         path: `/json/buildings`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2496,14 +2430,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONPictoPrototypeObject, any>({
         path: `/json/pictos`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2526,14 +2460,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONRuinPrototypeObject, any>({
         path: `/json/ruins`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2554,14 +2488,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONUserObject, any>({
         path: `/json/me`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2584,14 +2518,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONUserObject, any>({
         path: `/json/user`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2614,14 +2548,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONUserObject[], any>({
         path: `/json/users`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2646,14 +2580,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONGameObject, any>({
         path: `/json/map`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2675,9 +2609,9 @@ export class Api<
         /** Season. Defaults to current season. Use 'a' to select the MyHordes alpha Season and 'b' to select the MyHordes beta season, otherwise enter a season number. */
         season?: number | string;
         /** Optional town language filter. */
-        language?: "de" | "fr" | "es" | "en" | "multi";
+        language?: 'de' | 'fr' | 'es' | 'en' | 'multi';
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<
         {
@@ -2686,10 +2620,10 @@ export class Api<
         any
       >({
         path: `/json/townlist`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
 
@@ -2712,14 +2646,14 @@ export class Api<
         /** Comma-separated list of languages to fetch the content in. Note that passing only a single language will turn all language-dependant fields to a single string. */
         languages?: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<JSONTownObject[], any>({
         path: `/json/towns`,
-        method: "GET",
+        method: 'GET',
         query: query,
         secure: true,
-        format: "json",
+        format: 'json',
         ...params,
       }),
   };

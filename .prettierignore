@@ -1,4 +1,5 @@
 dist
 node_modules
 openapi.json
-src/utils/MHApi.ts
+src/utils/mh-api.ts
+src/generated/prisma

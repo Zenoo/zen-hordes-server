@@ -50,5 +50,13 @@ export const routeDetails = <TReq extends z.ZodType, TRes extends z.ZodType>(
         },
       },
     },
+    503: {
+      description: 'Service Unavailable',
+      content: {
+        'application/json': {
+          schema: errorResponseSchema,
+        },
+      },
+    },
   },
 });

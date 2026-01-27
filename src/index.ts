@@ -2,6 +2,10 @@ import 'dotenv/config';
 import express from 'express';
 import { updateRouter } from './routes/update.route';
 import { swaggerRouter } from './routes/swagger.route';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
