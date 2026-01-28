@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.3...v1.0.4) (2026-01-28)
+
+
+### Bug Fixes
+
+* Call MH api only once ([1c945ce](https://github.com/Zenoo/zen-hordes-server/commit/1c945ce39ac4a2e81ecb8eae8a543795f2484f16))
+
 ## [1.0.3](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.2...v1.0.3) (2026-01-28)
 
 
