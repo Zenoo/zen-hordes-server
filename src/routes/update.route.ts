@@ -7,6 +7,7 @@ import { createTown } from '../utils/town';
 import { createUser } from '../utils/user';
 import { sendError, validate } from '../utils/error';
 import { prisma } from '../utils/prisma';
+import { updateCacheAfterUserUpdate } from '../utils/cache-update';
 
 const requestSchema = registry.register(
   'UpdateRequest',
@@ -57,6 +58,7 @@ const responseSchema = registry.register(
   })
 );
 
+export type UpdateRequestType = z.infer<typeof requestSchema>;
 type ResponseType = z.infer<typeof responseSchema>;
 
 registry.registerPath({
@@ -141,6 +143,9 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
         },
       },
     });
+
+    // Update caches
+    updateCacheAfterUserUpdate(data);
 
     res.json({ success: true });
   } catch (error) {

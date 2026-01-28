@@ -3,6 +3,7 @@ import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums';
 import { ZoneCreateManyInput, ZoneItemCreateManyInput } from '../generated/prisma/models';
 import { Api, JSONGameObject } from './api/mh-api';
 import { prisma } from './prisma';
+import { updateCacheAfterHourlyUpdate } from './cache-update';
 
 const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number]) => {
   const jobIcon = citizen.job?.uid;
@@ -72,14 +73,16 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
       where: { townId },
     });
 
+    const bankItems = data.city.bank.map((item) => ({
+      townId,
+      id: item.id ?? 0,
+      quantity: item.count ?? 1,
+      broken: item.broken ?? false,
+    }));
+
     // Create new bank items
     await prisma.bankItem.createMany({
-      data: data.city.bank.map((item) => ({
-        townId,
-        id: item.id ?? 0,
-        quantity: item.count,
-        broken: item.broken,
-      })),
+      data: bankItems,
     });
 
     // Update town data
@@ -195,6 +198,9 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
       }
     }
   }
+
+  // Update cache
+  updateCacheAfterHourlyUpdate(townId, data, citizensData);
 };
 
 export const getOrCreateTown = async (api: Api<unknown>, id: number) => {

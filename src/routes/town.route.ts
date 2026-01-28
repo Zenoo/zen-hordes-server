@@ -95,7 +95,7 @@ const responseSchema = registry.register(
   })
 );
 
-type ResponseType = z.infer<typeof responseSchema>;
+export type TownResponseType = z.infer<typeof responseSchema>;
 
 registry.registerPath({
   method: 'post',
@@ -107,7 +107,7 @@ registry.registerPath({
 
 const router = Router();
 
-router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse>) => {
+router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResponse>) => {
   try {
     const { townId, userId } = validate(requestSchema, req);
 
@@ -129,10 +129,10 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
     }
 
     // Create cache key (by townId only since data is same for all citizens)
-    const cacheKey = `town:${townId}`;
+    const cacheKey = `town:${townId}` as const;
 
     // Check cache
-    const cached = getCached<ResponseType>(cacheKey);
+    const cached = getCached(cacheKey);
     if (cached) {
       return res.json(cached);
     }
@@ -215,7 +215,7 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
       })),
     };
 
-    const response: ResponseType = {
+    const response: TownResponseType = {
       success: true,
       town: formattedTown,
     };

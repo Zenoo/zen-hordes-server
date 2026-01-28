@@ -53,7 +53,7 @@ const responseSchema = registry.register(
   })
 );
 
-type ResponseType = z.infer<typeof responseSchema>;
+export type MapsResponseType = z.infer<typeof responseSchema>;
 
 registry.registerPath({
   method: 'post',
@@ -65,19 +65,19 @@ registry.registerPath({
 
 const router = Router();
 
-router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse>) => {
+router.post('/', async (req: Request, res: Response<MapsResponseType | ErrorResponse>) => {
   try {
     const { townIds, key } = validate(requestSchema, req);
 
-    type TownData = ResponseType['towns'][number];
+    type TownData = MapsResponseType['towns'][number];
 
     // Check cache for each town individually
     const cachedTowns: TownData[] = [];
     const uncachedTownIds: number[] = [];
 
     for (const townId of townIds) {
-      const cacheKey = `town-map:${townId}`;
-      const cached = getCached<TownData>(cacheKey);
+      const cacheKey = `town-map:${townId}` as const;
+      const cached = getCached(cacheKey);
       if (cached) {
         cachedTowns.push(cached);
       } else {
@@ -142,14 +142,14 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
 
       // Cache each town individually
       for (const town of fetchedTowns) {
-        const cacheKey = `town-map:${town.id}`;
+        const cacheKey = `town-map:${town.id}` as const;
         setCached(cacheKey, town);
       }
     }
 
     const towns = [...cachedTowns, ...fetchedTowns];
 
-    const response: ResponseType = {
+    const response: MapsResponseType = {
       success: true,
       towns,
     };
