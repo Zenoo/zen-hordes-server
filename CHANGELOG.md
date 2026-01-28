@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.1...v1.0.2) (2026-01-28)
+
+
+### Bug Fixes
+
+* Update caches ([451846a](https://github.com/Zenoo/zen-hordes-server/commit/451846a1a6570ac003176730fc0cef9d1a6119eb))
+
 ## [1.0.1](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.0...v1.0.1) (2026-01-28)
 
 
