@@ -68,11 +68,7 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
   }
 };
 
-export const updateCacheAfterHourlyUpdate = (
-  townId: number,
-  data: JSONGameObject,
-  citizensData: JSONGameObject
-): void => {
+export const updateCacheAfterHourlyUpdate = (townId: number, data: JSONGameObject): void => {
   const townCacheKey = `town:${townId}` as const;
   const townCached = getCached(townCacheKey);
 
@@ -162,8 +158,8 @@ export const updateCacheAfterHourlyUpdate = (
   }
 
   // Update citizens
-  if (townCached?.town && citizensData.citizens?.length) {
-    for (const citizen of citizensData.citizens) {
+  if (townCached?.town && data.citizens?.length) {
+    for (const citizen of data.citizens) {
       const citizenIndex = townCached.town.citizens.findIndex((c) => c.userId === citizen.id);
 
       if (citizenIndex !== -1 && (citizen.x !== undefined || citizen.y !== undefined)) {
@@ -180,8 +176,8 @@ export const updateCacheAfterHourlyUpdate = (
   }
 
   // Update citizens in map cache
-  if (mapCached && citizensData.citizens?.length) {
-    for (const citizen of citizensData.citizens) {
+  if (mapCached && data.citizens?.length) {
+    for (const citizen of data.citizens) {
       const citizenIndex = mapCached.citizens.findIndex((c) => c.x === citizen.x && c.y === citizen.y);
 
       if (citizenIndex !== -1 && (citizen.x !== undefined || citizen.y !== undefined)) {

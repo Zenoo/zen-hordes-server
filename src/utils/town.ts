@@ -63,7 +63,8 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
         details,
         items,
         building
-      )
+      ),
+      citizens.fields(id,x,y)
     `.replace(/\s+/g, ''),
   });
 
@@ -165,17 +166,12 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
   }
 
   // Update citizen positions
-  const { data: citizensData } = await api.json.getJson2({
-    mapId: townId,
-    fields: 'citizens.fields(id,x,y)',
-  });
-
   const existingCitizens = await prisma.citizen.findMany({
     where: { townId },
   });
 
-  if (citizensData.citizens?.length) {
-    for (const citizen of citizensData.citizens) {
+  if (data.citizens?.length) {
+    for (const citizen of data.citizens) {
       const existingCitizen = existingCitizens.find((ec) => ec.userId === citizen.id);
 
       if (!existingCitizen) {
@@ -200,7 +196,7 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
   }
 
   // Update cache
-  updateCacheAfterHourlyUpdate(townId, data, citizensData);
+  updateCacheAfterHourlyUpdate(townId, data);
 };
 
 export const getOrCreateTown = async (api: Api<unknown>, id: number) => {
@@ -257,12 +253,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
         details,
         items,
         building
-      )`.replace(/\s+/g, ''),
-  });
-
-  const { data: citizensData } = await api.json.getJson2({
-    mapId: id,
-    fields: `
+      ),
       citizens.fields(
         id,
         x,
@@ -363,14 +354,14 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
   }
 
   // Create citizens
-  if (citizensData.citizens?.length) {
+  if (data.citizens?.length) {
     const knownUsers = await prisma.user.findMany({
       where: {
-        id: { in: citizensData.citizens.map((c) => c.id ?? 0) },
+        id: { in: data.citizens.map((c) => c.id ?? 0) },
       },
     });
 
-    const newUsers = citizensData.citizens.filter((citizen) => !knownUsers.some((u) => u.id === citizen.id));
+    const newUsers = data.citizens.filter((citizen) => !knownUsers.some((u) => u.id === citizen.id));
 
     // Create new users
     if (newUsers.length > 0) {
@@ -391,7 +382,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
     }
 
     await prisma.citizen.createMany({
-      data: citizensData.citizens.map((citizen) => ({
+      data: data.citizens.map((citizen) => ({
         userId: citizen.id ?? 0,
         townId: town.id,
         job: getCitizenJob(citizen),
