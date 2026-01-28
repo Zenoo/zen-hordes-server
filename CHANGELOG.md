@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.0...v1.0.1) (2026-01-28)
+
+
+### Bug Fixes
+
+* Missing citizen position ([53a41d6](https://github.com/Zenoo/zen-hordes-server/commit/53a41d6e0f2138c86afbf7cf891e4a44b8c7805f))
+* Update citizen position on town update ([6c7c4be](https://github.com/Zenoo/zen-hordes-server/commit/6c7c4bedac63760a0b4f9a21d68a936452e974e7))
+
 ## 1.0.0 (2026-01-28)
 
 
