@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.2...v1.0.3) (2026-01-28)
+
+
+### Bug Fixes
+
+* Add tests ([1d7cdff](https://github.com/Zenoo/zen-hordes-server/commit/1d7cdff7f1e42274873d52922ac5510d9d0ba2fb))
+
 ## [1.0.2](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.1...v1.0.2) (2026-01-28)
 
 
