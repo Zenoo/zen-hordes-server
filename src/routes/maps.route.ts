@@ -39,6 +39,14 @@ const responseSchema = registry.register(
               })
             )
             .openapi({ description: 'List of zones from the requested towns' }),
+          citizens: z
+            .array(
+              z.object({
+                x: z.number().openapi({ description: 'X coordinate of the citizen' }),
+                y: z.number().openapi({ description: 'Y coordinate of the citizen' }),
+              })
+            )
+            .openapi({ description: 'List of citizens in the town' }),
         })
       )
       .openapi({ description: 'List of towns with their zones' }),

@@ -66,37 +66,35 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
     `.replace(/\s+/g, ''),
   });
 
-  if (!data.city?.bank) {
-    return;
+  if (data.city?.bank) {
+    // Delete old bank items
+    await prisma.bankItem.deleteMany({
+      where: { townId },
+    });
+
+    // Create new bank items
+    await prisma.bankItem.createMany({
+      data: data.city.bank.map((item) => ({
+        townId,
+        id: item.id ?? 0,
+        quantity: item.count,
+        broken: item.broken,
+      })),
+    });
+
+    // Update town data
+    await prisma.town.update({
+      where: { id: townId },
+      data: {
+        lastUpdate: new Date(),
+        waterInWell: data.city.water,
+        chaos: data.city.chaos,
+        devastated: data.city.devast,
+        doorOpened: data.city.door,
+        insurrected: data.conspiracy,
+      },
+    });
   }
-
-  // Delete old bank items
-  await prisma.bankItem.deleteMany({
-    where: { townId },
-  });
-
-  // Create new bank items
-  await prisma.bankItem.createMany({
-    data: data.city.bank.map((item) => ({
-      townId,
-      id: item.id ?? 0,
-      quantity: item.count,
-      broken: item.broken,
-    })),
-  });
-
-  // Update town data
-  await prisma.town.update({
-    where: { id: townId },
-    data: {
-      lastUpdate: new Date(),
-      waterInWell: data.city.water,
-      chaos: data.city.chaos,
-      devastated: data.city.devast,
-      doorOpened: data.city.door,
-      insurrected: data.conspiracy,
-    },
-  });
 
   // Update zones
   if (data.zones?.length) {
@@ -158,6 +156,41 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
             },
           },
           data: zoneData,
+        });
+      }
+    }
+  }
+
+  // Update citizen positions
+  const { data: citizensData } = await api.json.getJson2({
+    mapId: townId,
+    fields: 'citizens.fields(x,y)',
+  });
+
+  const existingCitizens = await prisma.citizen.findMany({
+    where: { townId },
+  });
+
+  if (citizensData.citizens?.length) {
+    for (const citizen of citizensData.citizens) {
+      const existingCitizen = existingCitizens.find((ec) => ec.userId === citizen.id);
+
+      if (!existingCitizen) {
+        continue;
+      }
+
+      if (existingCitizen.x !== citizen.x || existingCitizen.y !== citizen.y) {
+        await prisma.citizen.update({
+          where: {
+            userId_townId: {
+              userId: existingCitizen.userId,
+              townId,
+            },
+          },
+          data: {
+            x: citizen.x ?? existingCitizen.x,
+            y: citizen.y ?? existingCitizen.y,
+          },
         });
       }
     }
