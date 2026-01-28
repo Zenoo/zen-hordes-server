@@ -164,7 +164,7 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
   // Update citizen positions
   const { data: citizensData } = await api.json.getJson2({
     mapId: townId,
-    fields: 'citizens.fields(x,y)',
+    fields: 'citizens.fields(id,x,y)',
   });
 
   const existingCitizens = await prisma.citizen.findMany({
@@ -259,6 +259,11 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
     fields: `
       citizens.fields(
         id,
+        x,
+        y,
+        dead,
+        out,
+        ban,
         name,
         twinId,
         etwinId,
