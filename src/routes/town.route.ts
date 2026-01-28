@@ -4,6 +4,7 @@ import { registry } from '../utils/api/openapi';
 import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas';
 import { sendError, validate } from '../utils/error';
 import { prisma } from '../utils/prisma';
+import { getCached, setCached } from '../utils/cache';
 
 const requestSchema = registry.register(
   'TownRequest',
@@ -127,6 +128,15 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
       });
     }
 
+    // Create cache key (by townId only since data is same for all citizens)
+    const cacheKey = `town:${townId}`;
+
+    // Check cache
+    const cached = getCached<ResponseType>(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
+
     const town = await prisma.town.findUnique({
       where: {
         id: townId,
@@ -205,10 +215,15 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
       })),
     };
 
-    res.json({
+    const response: ResponseType = {
       success: true,
       town: formattedTown,
-    });
+    };
+
+    // Cache the response
+    setCached(cacheKey, response);
+
+    res.json(response);
   } catch (error) {
     sendError(res, error);
   }

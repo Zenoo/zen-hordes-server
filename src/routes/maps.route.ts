@@ -6,6 +6,7 @@ import { sendError, validate } from '../utils/error';
 import { prisma } from '../utils/prisma';
 import { createMHApi } from '../utils/api/mh-api.helper';
 import { getOrCreateTown } from '../utils/town';
+import { getCached, setCached } from '../utils/cache';
 
 const requestSchema = registry.register(
   'MapsRequest',
@@ -60,62 +61,92 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
   try {
     const { townIds, key } = validate(requestSchema, req);
 
-    // Check which towns exist in the database
-    const existingTowns = await prisma.town.findMany({
-      where: {
-        id: {
-          in: townIds,
-        },
-      },
-      select: { id: true },
-    });
+    type TownData = ResponseType['towns'][number];
 
-    const existingTownIds = new Set(existingTowns.map((t) => t.id));
-    const missingTownIds = townIds.filter((id) => !existingTownIds.has(id));
+    // Check cache for each town individually
+    const cachedTowns: TownData[] = [];
+    const uncachedTownIds: number[] = [];
 
-    // Fetch missing towns from MyHordes API
-    if (missingTownIds.length > 0) {
-      // Initialize MH API
-      const api = createMHApi(key);
-
-      await Promise.all(missingTownIds.map((townId) => getOrCreateTown(api, townId)));
+    for (const townId of townIds) {
+      const cacheKey = `town-map:${townId}`;
+      const cached = getCached<TownData>(cacheKey);
+      if (cached) {
+        cachedTowns.push(cached);
+      } else {
+        uncachedTownIds.push(townId);
+      }
     }
 
-    const towns = await prisma.town.findMany({
-      where: {
-        id: {
-          in: townIds,
-        },
-      },
-      select: {
-        id: true,
-        x: true,
-        y: true,
-        width: true,
-        height: true,
-        zones: {
-          select: {
-            x: true,
-            y: true,
-            visitedToday: true,
-            dangerLevel: true,
-            buildingId: true,
-          },
-          orderBy: [{ x: 'asc' }, { y: 'asc' }],
-        },
-        citizens: {
-          select: {
-            x: true,
-            y: true,
-          },
-        },
-      },
-    });
+    let fetchedTowns: TownData[] = [];
 
-    res.json({
+    if (uncachedTownIds.length > 0) {
+      // Check which towns exist in the database
+      const existingTowns = await prisma.town.findMany({
+        where: {
+          id: {
+            in: uncachedTownIds,
+          },
+        },
+        select: { id: true },
+      });
+
+      const existingTownIds = new Set(existingTowns.map((t) => t.id));
+      const missingTownIds = uncachedTownIds.filter((id) => !existingTownIds.has(id));
+
+      // Fetch missing towns from MyHordes API
+      if (missingTownIds.length > 0) {
+        // Initialize MH API
+        const api = createMHApi(key);
+
+        await Promise.all(missingTownIds.map((townId) => getOrCreateTown(api, townId)));
+      }
+
+      fetchedTowns = await prisma.town.findMany({
+        where: {
+          id: {
+            in: uncachedTownIds,
+          },
+        },
+        select: {
+          id: true,
+          x: true,
+          y: true,
+          width: true,
+          height: true,
+          zones: {
+            select: {
+              x: true,
+              y: true,
+              visitedToday: true,
+              dangerLevel: true,
+              buildingId: true,
+            },
+            orderBy: [{ x: 'asc' }, { y: 'asc' }],
+          },
+          citizens: {
+            select: {
+              x: true,
+              y: true,
+            },
+          },
+        },
+      });
+
+      // Cache each town individually
+      for (const town of fetchedTowns) {
+        const cacheKey = `town-map:${town.id}`;
+        setCached(cacheKey, town);
+      }
+    }
+
+    const towns = [...cachedTowns, ...fetchedTowns];
+
+    const response: ResponseType = {
       success: true,
       towns,
-    });
+    };
+
+    res.json(response);
   } catch (error) {
     sendError(res, error);
   }
