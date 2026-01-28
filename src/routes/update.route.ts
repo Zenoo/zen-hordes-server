@@ -3,22 +3,57 @@ import { z } from 'zod';
 import { createMHApi } from '../utils/api/mh-api.helper';
 import { registry } from '../utils/api/openapi';
 import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas';
-import { getTown } from '../utils/town';
-import { getUser } from '../utils/user';
+import { createTown } from '../utils/town';
+import { createUser } from '../utils/user';
+import { sendError, validate } from '../utils/error';
+import { prisma } from '../utils/prisma';
 
 const requestSchema = registry.register(
   'UpdateRequest',
   z.object({
-    userkey: z.string().min(1).openapi({ description: 'User key for MyHordes API authentication' }),
+    key: z.string().min(1).openapi({ description: 'User key for MyHordes API authentication' }),
     townId: z.number().openapi({ description: 'ID of the town' }),
     userId: z.number().openapi({ description: 'ID of the user' }),
+    x: z.number().openapi({ description: 'X coordinate of the user' }),
+    y: z.number().openapi({ description: 'Y coordinate of the user' }),
+    zombies: z.number().openapi({ description: 'Number of zombies in the zone' }),
+    depleted: z.boolean().openapi({ description: 'Indicates if the zone is depleted' }),
+    buildingId: z.number().optional().openapi({ description: 'ID of the building in the zone, if any' }),
+    scoutRadar: z
+      .object({
+        east: z.number().openapi({ description: 'Zombies estimated to be present to the east' }),
+        north: z.number().openapi({ description: 'Zombies estimated to be present to the north' }),
+        west: z.number().openapi({ description: 'Zombies estimated to be present to the west' }),
+        south: z.number().openapi({ description: 'Zombies estimated to be present to the south' }),
+      })
+      .optional()
+      .openapi({ description: 'Scout radar information' }),
+    scavRadar: z
+      .object({
+        east: z.boolean().openapi({ description: 'East zone is depleted' }),
+        north: z.boolean().openapi({ description: 'North zone is depleted' }),
+        west: z.boolean().openapi({ description: 'West zone is depleted' }),
+        south: z.boolean().openapi({ description: 'South zone is depleted' }),
+      })
+      .optional()
+      .openapi({ description: 'Scavenger radar information' }),
+    items: z
+      .array(
+        z.object({
+          id: z.number().openapi({ description: 'Item ID' }),
+          quantity: z.number().openapi({ description: 'Quantity of the item' }),
+          broken: z.boolean().openapi({ description: 'Indicates if the item is broken' }),
+        })
+      )
+      .openapi({ description: 'List of items' }),
   })
 );
 
 const responseSchema = registry.register(
   'UpdateResponse',
   z.object({
-    available: z.boolean().openapi({ description: 'MyHordes API status' }),
+    success: z.boolean().openapi({ description: 'Indicates if the update was successful' }),
+    error: z.string().optional().openapi({ description: 'Error message if the update failed' }),
   })
 );
 
@@ -36,40 +71,80 @@ const router = Router();
 
 router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse>) => {
   try {
-    const validationResult = requestSchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: validationResult.error.issues,
-      });
-    }
-
-    const { userkey, townId, userId } = validationResult.data;
+    const data = validate(requestSchema, req);
 
     // Initialize MH API with credentials
-    const api = createMHApi(userkey);
+    const api = createMHApi(data.key);
 
     // Fetch API status
-    const { data } = await api.json.statusList();
+    const status = await api.json.statusList();
 
-    const available = !data.attack && !data.maintain;
+    const available = !status.data.attack && !status.data.maintain;
 
     if (!available) {
-      res.status(503).json({ error: 'MyHordes API is currently unavailable' });
+      res.status(503).json({ success: false, error: 'MyHordes API is currently unavailable' });
       return;
     }
 
-    const user = await getUser(api, userId);
+    // Create user & town if needed
+    const user = await createUser(api, data.userId, data.key);
+    await createTown(api, data.townId);
 
-    const town = await getTown(api, user, townId);
-    console.log(town.id);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error',
+    let dangerLevel = 0;
+    if (data.zombies > 5) {
+      dangerLevel = 3;
+    } else if (data.zombies > 2) {
+      dangerLevel = 2;
+    } else if (data.zombies > 0) {
+      dangerLevel = 1;
+    }
+
+    // Update current zone
+    await prisma.zone.upsert({
+      where: {
+        townId_x_y: {
+          townId: data.townId,
+          x: data.x,
+          y: data.y,
+        },
+      },
+      create: {
+        townId: data.townId,
+        x: data.x,
+        y: data.y,
+        zombies: data.zombies,
+        visitedToday: true,
+        dangerLevel,
+        depleted: data.depleted,
+        buildingId: data.buildingId,
+        updatedAt: new Date(),
+        updatedById: user.id,
+        items: {
+          createMany: {
+            data: data.items,
+          },
+        },
+      },
+      update: {
+        zombies: data.zombies,
+        visitedToday: true,
+        dangerLevel,
+        depleted: data.depleted,
+        buildingId: data.buildingId,
+        updatedAt: new Date(),
+        updatedById: user.id,
+        items: {
+          deleteMany: {},
+          createMany: {
+            data: data.items,
+          },
+        },
+      },
     });
+
+    res.json({ success: true });
+  } catch (error) {
+    sendError(res, error);
   }
 });
 

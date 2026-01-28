@@ -2,9 +2,10 @@ import { Locale } from '../generated/prisma/enums';
 import { Api } from './api/mh-api';
 import { prisma } from './prisma';
 
-export const getUser = async (api: Api<unknown>, id: number) => {
+export const createUser = async (api: Api<unknown>, id: number, key: string) => {
   let user = await prisma.user.findUnique({
     where: { id },
+    select: { id: true },
   });
 
   if (user) {
@@ -33,7 +34,9 @@ export const getUser = async (api: Api<unknown>, id: number) => {
       name: data.name ?? 'Unknown',
       locale,
       avatar: data.avatar,
+      key,
     },
+    select: { id: true },
   });
 
   return user;

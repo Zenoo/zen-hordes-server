@@ -1,9 +1,8 @@
 import dayjs from 'dayjs';
 import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums';
+import { ZoneCreateManyInput, ZoneItemCreateManyInput } from '../generated/prisma/models';
 import { Api, JSONGameObject } from './api/mh-api';
 import { prisma } from './prisma';
-import { User } from '../generated/prisma/client';
-import { ZoneCreateManyInput, ZoneItemCreateManyInput } from '../generated/prisma/models';
 
 const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number]) => {
   const jobIcon = citizen.job?.uid;
@@ -26,61 +25,181 @@ const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number])
   }
 };
 
-const mapZoneData = (_zone: NonNullable<JSONGameObject['zones']>[number]): ZoneCreateManyInput => {
+const mapZoneData = (townId: number, _zone: NonNullable<JSONGameObject['zones']>[number]): ZoneCreateManyInput => {
   const zone = _zone as typeof _zone & {
     // The Swagger is not up to date, those fields exist
-    nvt?: boolean;
+    nvt?: 1 | 0;
     danger?: number;
     details: [] | { dried?: boolean; z?: number };
+  } & {
+    building?: { type: number };
   };
 
   return {
-    townId: 0,
+    townId,
     x: zone.x ?? 0,
     y: zone.y ?? 0,
-    visitedToday: typeof zone.nvt === 'boolean' ? !zone.nvt : false,
+    visitedToday: typeof zone.nvt === 'number' ? zone.nvt === 0 : false,
     dangerLevel: typeof zone.danger === 'number' ? zone.danger : 0,
     depleted: 'dried' in zone.details ? zone.details.dried : false,
     zombies: 'z' in zone.details ? zone.details.z : 0,
-    buildingId: zone.building?.id,
+    buildingId: zone.building?.type,
   };
 };
 
-export const getTown = async (api: Api<unknown>, user: Pick<User, 'id'>, id: number) => {
-  let town = await prisma.town.findUnique({
+const updateCity = async (api: Api<unknown>, townId: number) => {
+  // Fetch city data from MyHordes API
+  const { data } = await api.json.getJson2({
+    mapId: townId,
+    fields: `
+      conspiracy,
+      city.fields(bank,water,chaos,devast,door),
+      zones.fields(
+        x,
+        y,
+        nvt,
+        danger,
+        details,
+        items,
+        building
+      )
+    `.replace(/\s+/g, ''),
+  });
+
+  if (!data.city?.bank) {
+    return;
+  }
+
+  // Delete old bank items
+  await prisma.bankItem.deleteMany({
+    where: { townId },
+  });
+
+  // Create new bank items
+  await prisma.bankItem.createMany({
+    data: data.city.bank.map((item) => ({
+      townId,
+      id: item.id ?? 0,
+      quantity: item.count,
+      broken: item.broken,
+    })),
+  });
+
+  // Update town data
+  await prisma.town.update({
+    where: { id: townId },
+    data: {
+      lastUpdate: new Date(),
+      waterInWell: data.city.water,
+      chaos: data.city.chaos,
+      devastated: data.city.devast,
+      doorOpened: data.city.door,
+      insurrected: data.conspiracy,
+    },
+  });
+
+  // Update zones
+  if (data.zones?.length) {
+    const existingZones = await prisma.zone.findMany({
+      where: { townId },
+    });
+
+    const missingZones = data.zones.filter((z) => !existingZones.some((ez) => ez.x === z.x && ez.y === z.y));
+
+    // Create missing zones
+    if (missingZones.length > 0) {
+      await prisma.zone.createMany({
+        data: missingZones.map((z) => {
+          const zoneData = mapZoneData(townId, z);
+          return { ...zoneData, townId };
+        }),
+      });
+    }
+
+    // Update existing zones if needed
+    for (const _z of data.zones) {
+      const existingZone = existingZones.find((ez) => ez.x === _z.x && ez.y === _z.y);
+
+      if (!existingZone) {
+        continue;
+      }
+
+      const z = _z as typeof _z & {
+        // The Swagger is not up to date, those fields exist
+        nvt?: 1 | 0;
+        danger?: number;
+        details: [] | { dried?: boolean; z?: number };
+      } & {
+        building?: { type: number };
+      };
+
+      let needUpdate = false;
+
+      if ('dried' in z.details && existingZone.depleted !== z.details.dried) {
+        needUpdate = true;
+      } else if ('z' in z.details && existingZone.zombies !== z.details.z) {
+        needUpdate = true;
+      } else if (typeof z.nvt === 'number' && existingZone.visitedToday !== (z.nvt === 0)) {
+        needUpdate = true;
+      } else if (typeof z.danger === 'number' && existingZone.dangerLevel !== z.danger) {
+        needUpdate = true;
+      } else if (existingZone.buildingId !== z.building?.type) {
+        needUpdate = true;
+      }
+
+      if (needUpdate) {
+        const zoneData = mapZoneData(townId, z);
+        await prisma.zone.update({
+          where: {
+            townId_x_y: {
+              townId,
+              x: existingZone.x,
+              y: existingZone.y,
+            },
+          },
+          data: zoneData,
+        });
+      }
+    }
+  }
+};
+
+export const getOrCreateTown = async (api: Api<unknown>, id: number) => {
+  const town = await prisma.town.findUnique({
     where: { id },
-    include: { zones: true, bank: true, citizens: true },
+    select: { id: true, lastUpdate: true },
   });
 
   if (town) {
+    if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
+      await updateCity(api, town.id);
+    }
+
     return town;
   }
+
+  return createTownFromApi(api, id);
+};
+
+const createTownFromApi = async (api: Api<unknown>, id: number) => {
+  let town: { id: number; lastUpdate: Date | null } | null = null;
 
   // Fetch town from MyHordes API
   const { data } = await api.json.getJson2({
     mapId: id,
     fields: `
-      id
-      date
-      season
-      phase
-      source
-      wid
-      hei
-      bonusPts
-      conspiracy
-      custom
-      bank
-      citizens.fields(
-        id,
-        name,
-        twinId,
-        etwinId,
-        locale,
-        avatar,
-        job.uid
-      )
+      id,
+      date,
+      season,
+      phase,
+      source,
+      wid,
+      hei,
+      bonusPts,
+      conspiracy,
+      custom,
       city.fields(
+        bank,
         name,
         x,
         y,
@@ -90,7 +209,7 @@ export const getTown = async (api: Api<unknown>, user: Pick<User, 'id'>, id: num
         devast,
         door,
         hard
-      )
+      ),
       zones.fields(
         x,
         y,
@@ -99,6 +218,20 @@ export const getTown = async (api: Api<unknown>, user: Pick<User, 'id'>, id: num
         details,
         items,
         building
+      )`.replace(/\s+/g, ''),
+  });
+
+  const { data: citizensData } = await api.json.getJson2({
+    mapId: id,
+    fields: `
+      citizens.fields(
+        id,
+        name,
+        twinId,
+        etwinId,
+        locale,
+        avatar,
+        job.uid
       )`.replace(/\s+/g, ''),
   });
 
@@ -140,20 +273,15 @@ export const getTown = async (api: Api<unknown>, user: Pick<User, 'id'>, id: num
       devastated: data.city?.devast,
       doorOpened: data.city?.door,
       pandemonium: data.city?.hard,
-      zones: {
-        createMany: {
-          data: data.zones?.map(mapZoneData) ?? [],
-        },
-      },
     },
-    include: { zones: true, bank: true, citizens: true },
+    select: { id: true, lastUpdate: true },
   });
 
   // Create zones
   if (data.zones?.length) {
     await prisma.zone.createMany({
       data: data.zones.map((z) => {
-        const zoneData = mapZoneData(z);
+        const zoneData = mapZoneData(town.id, z);
         return { ...zoneData, townId: town.id };
       }),
     });
@@ -191,14 +319,14 @@ export const getTown = async (api: Api<unknown>, user: Pick<User, 'id'>, id: num
   }
 
   // Create citizens
-  if (data.citizens?.length) {
+  if (citizensData.citizens?.length) {
     const knownUsers = await prisma.user.findMany({
       where: {
-        id: { in: data.citizens.map((c) => c.id ?? 0) },
+        id: { in: citizensData.citizens.map((c) => c.id ?? 0) },
       },
     });
 
-    const newUsers = data.citizens.filter((citizen) => !knownUsers.some((u) => u.id === citizen.id));
+    const newUsers = citizensData.citizens.filter((citizen) => !knownUsers.some((u) => u.id === citizen.id));
 
     // Create new users
     if (newUsers.length > 0) {
@@ -213,12 +341,13 @@ export const getTown = async (api: Api<unknown>, user: Pick<User, 'id'>, id: num
               ? (citizen.locale as Locale)
               : Locale.EN,
           avatar: citizen.avatar,
+          key: '',
         })),
       });
     }
 
     await prisma.citizen.createMany({
-      data: data.citizens.map((citizen) => ({
+      data: citizensData.citizens.map((citizen) => ({
         userId: citizen.id ?? 0,
         townId: town.id,
         job: getCitizenJob(citizen),
@@ -232,4 +361,8 @@ export const getTown = async (api: Api<unknown>, user: Pick<User, 'id'>, id: num
   }
 
   return town;
+};
+
+export const createTown = async (api: Api<unknown>, id: number) => {
+  return getOrCreateTown(api, id);
 };

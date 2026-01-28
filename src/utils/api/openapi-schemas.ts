@@ -4,9 +4,9 @@ import { registry } from './openapi';
 export const errorResponseSchema = registry.register(
   'ErrorResponse',
   z.object({
-    error: z.string(),
-    details: z.array(z.unknown()).optional(),
-    message: z.string().optional(),
+    success: z.literal(false).openapi({ description: 'Indicates the request was unsuccessful' }),
+    error: z.string().openapi({ description: 'Error message describing the failure' }),
+    details: z.array(z.unknown()).optional().openapi({ description: 'Additional details about the error' }),
   })
 );
 
