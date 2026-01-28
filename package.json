@@ -1,6 +1,6 @@
 {
   "name": "zen-hordes-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Server for the Zen Hordes browser extension",
   "main": "index.js",
