@@ -1,5 +1,5 @@
 ---
-applyTo: '**/*.ts, **/*.tsx, **/*.js, **/*.jsx'
+applyTo: '**'
 ---
 
 # Project coding standards for TypeScript
