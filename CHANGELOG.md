@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.5](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.4...v1.0.5) (2026-01-30)
+
+
+### Bug Fixes
+
+* Include instructions for every prompt ([78bff05](https://github.com/Zenoo/zen-hordes-server/commit/78bff05aa413c138ff4dd74d93bfedab45b19e02))
+* Simplify copilot instructions ([da97ab8](https://github.com/Zenoo/zen-hordes-server/commit/da97ab810a24a1d54df2ca77bda080cc17aaf4ba))
+* Update scripts for katal deployment ([89eaf6f](https://github.com/Zenoo/zen-hordes-server/commit/89eaf6f4edb3ed7d089ef512a3f6c09a6bd04475))
+
 ## [1.0.4](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.3...v1.0.4) (2026-01-28)
 
 
