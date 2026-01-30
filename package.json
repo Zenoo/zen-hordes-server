@@ -10,7 +10,7 @@
     "openapi:generate": "tsx scripts/generate-openapi.ts",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node build/index.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -21,7 +21,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "prisma:migrate:dev": "prisma migrate dev && prisma generate"
+    "db:sync:dev": "prisma migrate dev && prisma generate",
+    "db:sync:production": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "Zenoo",

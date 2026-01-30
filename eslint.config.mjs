@@ -15,6 +15,6 @@ export default [
     },
   },
   {
-    ignores: ['dist/', 'node_modules/', 'openapi.json', 'src/utils/mh-api.ts', 'src/generated/prisma'],
+    ignores: ['build/', 'node_modules/', 'openapi.json', 'src/utils/mh-api.ts', 'src/generated/prisma'],
   },
 ];
