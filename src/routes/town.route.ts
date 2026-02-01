@@ -5,12 +5,15 @@ import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas';
 import { sendError, validate } from '../utils/error';
 import { prisma } from '../utils/prisma';
 import { getCached, setCached } from '../utils/cache';
+import { createMHApi } from '../utils/api/mh-api.helper';
+import { getOrCreateTown } from '../utils/town';
 
 const requestSchema = registry.register(
   'TownRequest',
   z.object({
     townId: z.number().openapi({ description: 'ID of the town to fetch' }),
     userId: z.number().openapi({ description: 'ID of the user requesting the data' }),
+    key: z.string().min(1).openapi({ description: 'User key for MyHordes API authentication' }),
   })
 );
 
@@ -109,7 +112,7 @@ const router = Router();
 
 router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResponse>) => {
   try {
-    const { townId, userId } = validate(requestSchema, req);
+    const { townId, userId, key } = validate(requestSchema, req);
 
     // Check if user is a citizen of the town
     const citizen = await prisma.citizen.findUnique({
@@ -137,7 +140,7 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
       return res.json(cached);
     }
 
-    const town = await prisma.town.findUnique({
+    let town = await prisma.town.findUnique({
       where: {
         id: townId,
       },
@@ -153,10 +156,31 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
     });
 
     if (!town) {
-      return res.json({
-        success: true,
-        town: null,
+      // Fetch missing town
+      const api = createMHApi(key);
+      await getOrCreateTown(api, townId);
+
+      town = await prisma.town.findUnique({
+        where: {
+          id: townId,
+        },
+        include: {
+          bank: true,
+          zones: {
+            include: {
+              items: true,
+            },
+          },
+          citizens: true,
+        },
       });
+
+      if (!town) {
+        return res.json({
+          success: true,
+          town: null,
+        });
+      }
     }
 
     const formattedTown = {
