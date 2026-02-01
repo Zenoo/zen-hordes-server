@@ -132,9 +132,9 @@ model Town {
   y           Int
   bonusPoints Int @default(0)
 
-  waterInWell Int       @default(0)
+  waterInWell Int      @default(0)
   type        TownType
-  lastUpdate  DateTime?
+  lastUpdate  DateTime
 
   insurrected Boolean @default(false)
   custom      Boolean @default(false)
@@ -154,4 +154,6 @@ model Town {
   bank      BankItem[]
   zoneItems ZoneItem[]
   citizens  Citizen[]
+
+  @@index([id, lastUpdate])
 }

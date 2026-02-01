@@ -3,11 +3,11 @@ import { z } from 'zod';
 import { createMHApi } from '../utils/api/mh-api.helper';
 import { registry } from '../utils/api/openapi';
 import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas';
-import { createTown } from '../utils/town';
-import { createUser } from '../utils/user';
+import { updateCacheAfterUserUpdate } from '../utils/cache-update';
 import { sendError, validate } from '../utils/error';
 import { prisma } from '../utils/prisma';
-import { updateCacheAfterUserUpdate } from '../utils/cache-update';
+import { createOrUpdateTowns } from '../utils/town';
+import { createUser } from '../utils/user';
 
 const requestSchema = registry.register(
   'UpdateRequest',
@@ -90,7 +90,7 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
 
     // Create user & town if needed
     const user = await createUser(api, data.userId, data.key);
-    await createTown(api, data.townId);
+    await createOrUpdateTowns(api, [data.townId]);
 
     let dangerLevel = 0;
     if (data.zombies > 5) {

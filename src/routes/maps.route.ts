@@ -1,12 +1,12 @@
 import { Request, Response, Router } from 'express';
 import { z } from 'zod';
+import { createMHApi } from '../utils/api/mh-api.helper';
 import { registry } from '../utils/api/openapi';
 import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas';
+import { getCached, setCached } from '../utils/cache';
 import { sendError, validate } from '../utils/error';
 import { prisma } from '../utils/prisma';
-import { createMHApi } from '../utils/api/mh-api.helper';
-import { getOrCreateTown } from '../utils/town';
-import { getCached, setCached } from '../utils/cache';
+import { createOrUpdateTowns } from '../utils/town';
 
 const requestSchema = registry.register(
   'MapsRequest',
@@ -88,26 +88,9 @@ router.post('/', async (req: Request, res: Response<MapsResponseType | ErrorResp
     let fetchedTowns: TownData[] = [];
 
     if (uncachedTownIds.length > 0) {
-      // Check which towns exist in the database
-      const existingTowns = await prisma.town.findMany({
-        where: {
-          id: {
-            in: uncachedTownIds,
-          },
-        },
-        select: { id: true },
-      });
+      const api = createMHApi(key);
 
-      const existingTownIds = new Set(existingTowns.map((t) => t.id));
-      const missingTownIds = uncachedTownIds.filter((id) => !existingTownIds.has(id));
-
-      // Fetch missing towns from MyHordes API
-      if (missingTownIds.length > 0) {
-        // Initialize MH API
-        const api = createMHApi(key);
-
-        await Promise.all(missingTownIds.map((townId) => getOrCreateTown(api, townId)));
-      }
+      await createOrUpdateTowns(api, uncachedTownIds);
 
       fetchedTowns = await prisma.town.findMany({
         where: {

@@ -170,6 +170,19 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
     where: { townId },
   });
 
+  const newDeadCitizens = existingCitizens.filter((ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId));
+
+  // Mark citizens as dead if they are no longer present
+  await prisma.citizen.updateMany({
+    where: {
+      townId,
+      userId: { in: newDeadCitizens.map((dc) => dc.userId) },
+    },
+    data: {
+      dead: true,
+    },
+  });
+
   if (data.citizens?.length) {
     for (const citizen of data.citizens) {
       const existingCitizen = existingCitizens.find((ec) => ec.userId === citizen.id);
@@ -197,23 +210,32 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
 
   // Update cache
   updateCacheAfterHourlyUpdate(townId, data);
+
+  return prisma.town.findUnique({
+    where: { id: townId },
+    select: { id: true, lastUpdate: true },
+  });
 };
 
-export const getOrCreateTown = async (api: Api<unknown>, id: number) => {
-  const town = await prisma.town.findUnique({
-    where: { id },
+export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[]) => {
+  const towns = await prisma.town.findMany({
+    where: { id: { in: ids } },
     select: { id: true, lastUpdate: true },
   });
 
-  if (town) {
-    if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
+  for (const id of ids) {
+    const town = towns.find((t) => t.id === id);
+
+    if (town) {
+      // if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
       await updateCity(api, town.id);
+      // }
+
+      continue;
     }
 
-    return town;
+    await createTownFromApi(api, id);
   }
-
-  return createTownFromApi(api, id);
 };
 
 const createTownFromApi = async (api: Api<unknown>, id: number) => {
@@ -396,8 +418,4 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
   }
 
   return town;
-};
-
-export const createTown = async (api: Api<unknown>, id: number) => {
-  return getOrCreateTown(api, id);
 };

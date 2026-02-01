@@ -1,12 +1,12 @@
 import { Request, Response, Router } from 'express';
 import { z } from 'zod';
+import { createMHApi } from '../utils/api/mh-api.helper';
 import { registry } from '../utils/api/openapi';
 import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas';
+import { getCached, setCached } from '../utils/cache';
 import { sendError, validate } from '../utils/error';
 import { prisma } from '../utils/prisma';
-import { getCached, setCached } from '../utils/cache';
-import { createMHApi } from '../utils/api/mh-api.helper';
-import { getOrCreateTown } from '../utils/town';
+import { createOrUpdateTowns } from '../utils/town';
 
 const requestSchema = registry.register(
   'TownRequest',
@@ -140,7 +140,9 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
       return res.json(cached);
     }
 
-    let town = await prisma.town.findUnique({
+    await createOrUpdateTowns(createMHApi(key), [townId]);
+
+    const town = await prisma.town.findUnique({
       where: {
         id: townId,
       },
@@ -156,31 +158,10 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
     });
 
     if (!town) {
-      // Fetch missing town
-      const api = createMHApi(key);
-      await getOrCreateTown(api, townId);
-
-      town = await prisma.town.findUnique({
-        where: {
-          id: townId,
-        },
-        include: {
-          bank: true,
-          zones: {
-            include: {
-              items: true,
-            },
-          },
-          citizens: true,
-        },
+      return res.json({
+        success: true,
+        town: null,
       });
-
-      if (!town) {
-        return res.json({
-          success: true,
-          town: null,
-        });
-      }
     }
 
     const formattedTown = {
