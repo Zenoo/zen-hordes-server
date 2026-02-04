@@ -29,6 +29,7 @@ describe('Town Route', () => {
         x: 0,
         y: 0,
         type: 'SMALL',
+        lastUpdate: new Date(),
         citizens: {
           create: {
             userId: 1,

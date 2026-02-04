@@ -227,9 +227,9 @@ export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[]) => {
     const town = towns.find((t) => t.id === id);
 
     if (town) {
-      // if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
-      await updateCity(api, town.id);
-      // }
+      if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
+        await updateCity(api, town.id);
+      }
 
       continue;
     }

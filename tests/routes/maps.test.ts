@@ -54,6 +54,7 @@ describe('Maps Route', () => {
         x: 0,
         y: 0,
         type: 'SMALL',
+        lastUpdate: new Date(),
         zones: {
           create: [
             {
@@ -97,6 +98,7 @@ describe('Maps Route', () => {
         x: 5,
         y: 5,
         type: 'SMALL',
+        lastUpdate: new Date(),
         zones: {
           create: [
             {
