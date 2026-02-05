@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.6](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.5...v1.0.6) (2026-02-04)
+
+
+### Bug Fixes
+
+* Fetch town from MH when missing in /town ([8979335](https://github.com/Zenoo/zen-hordes-server/commit/897933523bb3567f8fba5fba9344f682d7d479ba))
+* Restore hourly updates ([177a383](https://github.com/Zenoo/zen-hordes-server/commit/177a383e0d8e88f6161c616fadf4f48510056440))
+* Update town every hour when called ([c51e559](https://github.com/Zenoo/zen-hordes-server/commit/c51e5599e5881dc3e35f9b9cf47feed050cb6c5d))
+
 ## [1.0.5](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.4...v1.0.5) (2026-01-30)
 
 
