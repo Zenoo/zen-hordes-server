@@ -22,19 +22,19 @@ const requestSchema = registry.register(
     buildingId: z.number().optional().openapi({ description: 'ID of the building in the zone, if any' }),
     scoutRadar: z
       .object({
-        east: z.number().openapi({ description: 'Zombies estimated to be present to the east' }),
-        north: z.number().openapi({ description: 'Zombies estimated to be present to the north' }),
-        west: z.number().openapi({ description: 'Zombies estimated to be present to the west' }),
-        south: z.number().openapi({ description: 'Zombies estimated to be present to the south' }),
+        east: z.number().optional().openapi({ description: 'Zombies estimated to be present to the east' }),
+        north: z.number().optional().openapi({ description: 'Zombies estimated to be present to the north' }),
+        west: z.number().optional().openapi({ description: 'Zombies estimated to be present to the west' }),
+        south: z.number().optional().openapi({ description: 'Zombies estimated to be present to the south' }),
       })
       .optional()
       .openapi({ description: 'Scout radar information' }),
     scavRadar: z
       .object({
-        east: z.boolean().openapi({ description: 'East zone is depleted' }),
-        north: z.boolean().openapi({ description: 'North zone is depleted' }),
-        west: z.boolean().openapi({ description: 'West zone is depleted' }),
-        south: z.boolean().openapi({ description: 'South zone is depleted' }),
+        east: z.boolean().optional().openapi({ description: 'East zone is depleted' }),
+        north: z.boolean().optional().openapi({ description: 'North zone is depleted' }),
+        west: z.boolean().optional().openapi({ description: 'West zone is depleted' }),
+        south: z.boolean().optional().openapi({ description: 'South zone is depleted' }),
       })
       .optional()
       .openapi({ description: 'Scavenger radar information' }),
@@ -143,6 +143,49 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
         },
       },
     });
+
+    // Update adjacent zones depletion status based on scavenger radar
+    if (data.scavRadar) {
+      const updates = [];
+      for (const direction of ['east', 'north', 'west', 'south'] as const) {
+        if (data.scavRadar[direction] !== undefined) {
+          let adjacentX = data.x;
+          let adjacentY = data.y;
+
+          switch (direction) {
+            case 'east':
+              adjacentX += 1;
+              break;
+            case 'north':
+              adjacentY -= 1;
+              break;
+            case 'west':
+              adjacentX -= 1;
+              break;
+            case 'south':
+              adjacentY += 1;
+              break;
+          }
+
+          updates.push(
+            prisma.zone.update({
+              where: {
+                townId_x_y: {
+                  townId: data.townId,
+                  x: adjacentX,
+                  y: adjacentY,
+                },
+              },
+              data: {
+                depleted: data.scavRadar[direction],
+              },
+            })
+          );
+        }
+      }
+
+      await Promise.all(updates);
+    }
 
     // Update caches
     updateCacheAfterUserUpdate(data);

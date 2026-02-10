@@ -112,24 +112,7 @@ const router = Router();
 
 router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResponse>) => {
   try {
-    const { townId, userId, key } = validate(requestSchema, req);
-
-    // Check if user is a citizen of the town
-    const citizen = await prisma.citizen.findUnique({
-      where: {
-        userId_townId: {
-          userId,
-          townId,
-        },
-      },
-    });
-
-    if (!citizen) {
-      return res.status(403).json({
-        success: false,
-        error: 'User is not a citizen of this town',
-      });
-    }
+    const { townId, key } = validate(requestSchema, req);
 
     // Create cache key (by townId only since data is same for all citizens)
     const cacheKey = `town:${townId}` as const;

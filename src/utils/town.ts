@@ -26,7 +26,11 @@ const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number])
   }
 };
 
-const mapZoneData = (townId: number, _zone: NonNullable<JSONGameObject['zones']>[number]): ZoneCreateManyInput => {
+const mapZoneData = (
+  townId: number,
+  city: JSONGameObject['city'],
+  _zone: NonNullable<JSONGameObject['zones']>[number]
+): ZoneCreateManyInput => {
   const zone = _zone as typeof _zone & {
     // The Swagger is not up to date, those fields exist
     nvt?: 1 | 0;
@@ -38,8 +42,8 @@ const mapZoneData = (townId: number, _zone: NonNullable<JSONGameObject['zones']>
 
   return {
     townId,
-    x: zone.x ?? 0,
-    y: zone.y ?? 0,
+    x: (zone.x ?? 0) - (city?.x ?? 0),
+    y: -(zone.y ?? 0) + (city?.y ?? 0),
     visitedToday: typeof zone.nvt === 'number' ? zone.nvt === 0 : false,
     dangerLevel: typeof zone.danger === 'number' ? zone.danger : 0,
     depleted: 'dried' in zone.details ? zone.details.dried : false,
@@ -106,13 +110,18 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
       where: { townId },
     });
 
-    const missingZones = data.zones.filter((z) => !existingZones.some((ez) => ez.x === z.x && ez.y === z.y));
+    const missingZones = data.zones.filter(
+      (z) =>
+        !existingZones.some(
+          (ez) => ez.x === (z.x ?? 0) - (data.city?.x ?? 0) && ez.y === -(z.y ?? 0) + (data.city?.y ?? 0)
+        )
+    );
 
     // Create missing zones
     if (missingZones.length > 0) {
       await prisma.zone.createMany({
         data: missingZones.map((z) => {
-          const zoneData = mapZoneData(townId, z);
+          const zoneData = mapZoneData(townId, data.city, z);
           return { ...zoneData, townId };
         }),
       });
@@ -120,7 +129,9 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
 
     // Update existing zones if needed
     for (const _z of data.zones) {
-      const existingZone = existingZones.find((ez) => ez.x === _z.x && ez.y === _z.y);
+      const existingZone = existingZones.find(
+        (ez) => ez.x === (_z.x ?? 0) - (data.city?.x ?? 0) && ez.y === -(_z.y ?? 0) + (data.city?.y ?? 0)
+      );
 
       if (!existingZone) {
         continue;
@@ -150,7 +161,7 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
       }
 
       if (needUpdate) {
-        const zoneData = mapZoneData(townId, z);
+        const zoneData = mapZoneData(townId, data.city, z);
         await prisma.zone.update({
           where: {
             townId_x_y: {
@@ -338,7 +349,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
   if (data.zones?.length) {
     await prisma.zone.createMany({
       data: data.zones.map((z) => {
-        const zoneData = mapZoneData(town.id, z);
+        const zoneData = mapZoneData(town.id, data.city, z);
         return { ...zoneData, townId: town.id };
       }),
     });
@@ -348,8 +359,8 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
       if (!z.items) return [];
       return z.items.map((item) => ({
         townId: town.id,
-        x: z.x ?? 0,
-        y: z.y ?? 0,
+        x: (z.x ?? 0) - (data.city?.x ?? 0),
+        y: -(z.y ?? 0) + (data.city?.y ?? 0),
         id: item.id ?? 0,
         quantity: item.count,
         broken: item.broken,

@@ -40,6 +40,27 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
       townCached.town.zones.push(updatedZone);
     }
 
+    // Update depletion status of adjacent zones based on scavenger radar
+    if (data.scavRadar) {
+      const directions = ['east', 'north', 'west', 'south'] as const;
+      const adjacentCoords = {
+        east: { x: x + 1, y },
+        north: { x, y: y - 1 },
+        west: { x: x - 1, y },
+        south: { x, y: y + 1 },
+      };
+
+      for (const direction of directions) {
+        if (data.scavRadar[direction] !== undefined) {
+          const { x: adjX, y: adjY } = adjacentCoords[direction];
+          const zoneIndex = townCached.town.zones.findIndex((z) => z.x === adjX && z.y === adjY);
+          if (zoneIndex !== -1) {
+            townCached.town.zones[zoneIndex].depleted = data.scavRadar[direction];
+          }
+        }
+      }
+    }
+
     setCached(townCacheKey, townCached);
   }
 
