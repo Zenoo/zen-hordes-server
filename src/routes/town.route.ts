@@ -83,6 +83,7 @@ const responseSchema = registry.register(
           .array(
             z.object({
               userId: z.number().openapi({ description: 'User ID' }),
+              name: z.string().openapi({ description: 'Citizen name' }),
               job: z.string().nullable().openapi({ description: 'Citizen job' }),
               x: z.number().openapi({ description: 'Citizen X coordinate' }),
               y: z.number().openapi({ description: 'Citizen Y coordinate' }),
@@ -136,7 +137,11 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
             items: true,
           },
         },
-        citizens: true,
+        citizens: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
@@ -194,6 +199,7 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
       })),
       citizens: town.citizens.map((citizen) => ({
         userId: citizen.userId,
+        name: citizen.user.name,
         job: citizen.job,
         x: citizen.x,
         y: citizen.y,
