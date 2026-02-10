@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.7](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.6...v1.0.7) (2026-02-10)
+
+
+### Bug Fixes
+
+* Include citizen names in town request ([1c0f7ce](https://github.com/Zenoo/zen-hordes-server/commit/1c0f7cef22d8fbdc892f6f878085d16f8465f549))
+* Store zone coords relative to the city ([1607adf](https://github.com/Zenoo/zen-hordes-server/commit/1607adf9c19442d30ef2a2ccf865e91197ac1597))
+* Update tests after schema update ([70baf5f](https://github.com/Zenoo/zen-hordes-server/commit/70baf5f6a8b7061d0bbe6986842fc11af721e5d7))
+
 ## [1.0.6](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.5...v1.0.6) (2026-02-04)
 
 
