@@ -15,7 +15,7 @@ vi.mock('../../src/utils/api/mh-api.helper.js', () => ({
 }));
 
 vi.mock('../../src/utils/town.js', () => ({
-  getOrCreateTown: vi.fn(async () => ({})),
+  createOrUpdateTowns: vi.fn(async () => {}),
 }));
 
 describe('Maps Route', () => {

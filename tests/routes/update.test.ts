@@ -22,7 +22,7 @@ vi.mock('../../src/utils/api/mh-api.helper.js', () => ({
 }));
 
 vi.mock('../../src/utils/town.js', () => ({
-  createTown: vi.fn(async () => ({})),
+  createOrUpdateTowns: vi.fn(async () => {}),
 }));
 
 vi.mock('../../src/utils/user.js', () => ({
