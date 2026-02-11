@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.8](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.7...v1.0.8) (2026-02-11)
+
+
+### Bug Fixes
+
+* Auto deploy server ([9ebdfdc](https://github.com/Zenoo/zen-hordes-server/commit/9ebdfdc2cfea7a21525bbeda59a402b44a822cbb))
+* Build errors ([ff1985f](https://github.com/Zenoo/zen-hordes-server/commit/ff1985fbbfbae38eb5fa3e39bff6dc068663016c))
+* Generate prisma types before build ([ed7761f](https://github.com/Zenoo/zen-hordes-server/commit/ed7761f5a5ef0108c09245af11ae0242ee99b5bc))
+* Skip husky in prod ([6f240f0](https://github.com/Zenoo/zen-hordes-server/commit/6f240f0f08cb4ceb0e5233384cd754bad29ea5a3))
+* Wrong scav direction ([f6bd7af](https://github.com/Zenoo/zen-hordes-server/commit/f6bd7af2213de2049f298611bffa885de5c491e9))
+
 ## [1.0.7](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.6...v1.0.7) (2026-02-10)
 
 
