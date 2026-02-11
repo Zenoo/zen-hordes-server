@@ -9,7 +9,7 @@
     "mh-api:generate": "sh scripts/generate-mh-api.sh",
     "openapi:generate": "tsx scripts/generate-openapi.ts",
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node build/index.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
