@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.9](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.8...v1.0.9) (2026-02-11)
+
+
+### Bug Fixes
+
+* Deploy condition ([37ecb1a](https://github.com/Zenoo/zen-hordes-server/commit/37ecb1a55be085b2b5b25dc9206f999c3427b87d))
+
 ## [1.0.8](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.7...v1.0.8) (2026-02-11)
 
 
