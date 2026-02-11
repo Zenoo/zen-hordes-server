@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     tags:
-      - 'zen-hordes-server-v*'
+      - 'v*'
 
 jobs:
   update_deployments:
