@@ -20,7 +20,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky",
+    "prepare": "node .husky/install.mjs",
     "db:sync:dev": "prisma migrate dev && prisma generate",
     "db:sync:production": "prisma migrate deploy"
   },
