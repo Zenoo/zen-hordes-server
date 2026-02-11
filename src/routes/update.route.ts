@@ -157,13 +157,13 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
               adjacentX += 1;
               break;
             case 'north':
-              adjacentY -= 1;
+              adjacentY += 1;
               break;
             case 'west':
               adjacentX -= 1;
               break;
             case 'south':
-              adjacentY += 1;
+              adjacentY -= 1;
               break;
           }
 
