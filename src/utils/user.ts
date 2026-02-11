@@ -1,6 +1,6 @@
-import { Locale } from '../generated/prisma/enums';
-import { Api } from './api/mh-api';
-import { prisma } from './prisma';
+import { Locale } from '../generated/prisma/enums.js';
+import { Api } from './api/mh-api.js';
+import { prisma } from './prisma.js';
 
 export const createUser = async (api: Api<unknown>, id: number, key: string) => {
   let user = await prisma.user.findUnique({

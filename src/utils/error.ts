@@ -1,6 +1,6 @@
-import { Prisma } from '../generated/prisma/client';
+import { Prisma } from '../generated/prisma/client.js';
 import type { Request, Response } from 'express';
-import { ErrorResponse } from './api/openapi-schemas';
+import { ErrorResponse } from './api/openapi-schemas.js';
 import { z } from 'zod';
 
 export class ValidationError extends Error {

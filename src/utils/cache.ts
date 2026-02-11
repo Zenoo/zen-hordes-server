@@ -1,6 +1,6 @@
 import NodeCache from 'node-cache';
-import type { TownResponseType } from '../routes/town.route';
-import type { MapsResponseType } from '../routes/maps.route';
+import type { TownResponseType } from '../routes/town.route.js';
+import type { MapsResponseType } from '../routes/maps.route.js';
 
 // Cache with 1 hour TTL
 const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });

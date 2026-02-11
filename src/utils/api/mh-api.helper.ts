@@ -1,4 +1,4 @@
-import { Api } from './mh-api';
+import { Api } from './mh-api.js';
 
 /**
  * Creates and configures a new MyHordes API instance with the provided userkey

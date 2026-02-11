@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
-import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums';
-import { ZoneCreateManyInput, ZoneItemCreateManyInput } from '../generated/prisma/models';
-import { Api, JSONGameObject } from './api/mh-api';
-import { prisma } from './prisma';
-import { updateCacheAfterHourlyUpdate } from './cache-update';
+import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums.js';
+import { ZoneCreateManyInput, ZoneItemCreateManyInput } from '../generated/prisma/models.js';
+import { Api, JSONGameObject } from './api/mh-api.js';
+import { prisma } from './prisma.js';
+import { updateCacheAfterHourlyUpdate } from './cache-update.js';
 
 const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number]) => {
   const jobIcon = citizen.job?.uid;

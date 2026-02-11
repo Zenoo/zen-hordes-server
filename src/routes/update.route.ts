@@ -1,13 +1,13 @@
 import { Request, Response, Router } from 'express';
 import { z } from 'zod';
-import { createMHApi } from '../utils/api/mh-api.helper';
-import { registry } from '../utils/api/openapi';
-import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas';
-import { updateCacheAfterUserUpdate } from '../utils/cache-update';
-import { sendError, validate } from '../utils/error';
-import { prisma } from '../utils/prisma';
-import { createOrUpdateTowns } from '../utils/town';
-import { createUser } from '../utils/user';
+import { createMHApi } from '../utils/api/mh-api.helper.js';
+import { registry } from '../utils/api/openapi.js';
+import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas.js';
+import { updateCacheAfterUserUpdate } from '../utils/cache-update.js';
+import { sendError, validate } from '../utils/error.js';
+import { prisma } from '../utils/prisma.js';
+import { createOrUpdateTowns } from '../utils/town.js';
+import { createUser } from '../utils/user.js';
 
 const requestSchema = registry.register(
   'UpdateRequest',

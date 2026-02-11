@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { registry } from './openapi';
+import { registry } from './openapi.js';
 
 export const errorResponseSchema = registry.register(
   'ErrorResponse',

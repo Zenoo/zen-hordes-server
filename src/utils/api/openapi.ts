@@ -1,7 +1,7 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
-import packageJson from '../../../package.json';
+import packageJson from '../../../package.json' with { type: 'json' };
 
 // Extend Zod with OpenAPI methods - must be called before any schemas are created
 extendZodWithOpenApi(z);

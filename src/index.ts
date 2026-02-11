@@ -4,12 +4,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { updateRouter } from './routes/update.route';
-import { mapsRouter } from './routes/maps.route';
-import { townRouter } from './routes/town.route';
-import { swaggerRouter } from './routes/swagger.route';
+import { updateRouter } from './routes/update.route.js';
+import { mapsRouter } from './routes/maps.route.js';
+import { townRouter } from './routes/town.route.js';
+import { swaggerRouter } from './routes/swagger.route.js';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 
 dayjs.extend(customParseFormat);
 

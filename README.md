@@ -92,6 +92,57 @@ pnpm openapi:generate
    pnpm test:update
    ```
 
+## Production Deployment
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- pnpm (v10.12.4 or higher)
+- PostgreSQL database
+
+### Deployment Steps
+
+1. **Install Dependencies**
+
+   ```bash
+   pnpm install --frozen-lockfile
+   ```
+
+   Note: Dev dependencies are required for the build step.
+
+2. **Set Environment Variables**
+
+   Create a `.env` file or set these environment variables:
+
+   ```bash
+   NODE_ENV=production
+   API_APPKEY=your_myhordes_api_key
+   PORT=3000
+   DATABASE_URL=postgresql://user:password@host:5432/database?schema=public
+   ```
+
+3. **Run Database Migrations**
+
+   ```bash
+   pnpm db:sync:production
+   ```
+
+   This runs `prisma migrate deploy` (applies migrations without creating new ones).
+
+4. **Build the Application**
+
+   ```bash
+   pnpm build
+   ```
+
+   This compiles TypeScript to JavaScript in the `build/` directory.
+
+5. **Start the Server**
+
+   ```bash
+   pnpm start
+   ```
+
 ## Project Structure
 
 ```

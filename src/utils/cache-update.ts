@@ -1,6 +1,6 @@
-import { UpdateRequestType } from '../routes/update.route';
-import { JSONGameObject } from './api/mh-api';
-import { getCached, setCached } from './cache';
+import { UpdateRequestType } from '../routes/update.route.js';
+import { JSONGameObject } from './api/mh-api.js';
+import { getCached, setCached } from './cache.js';
 
 export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
   const { townId, x, y, buildingId, depleted, zombies, items } = data;
