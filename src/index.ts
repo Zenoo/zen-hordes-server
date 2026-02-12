@@ -10,6 +10,7 @@ import { townRouter } from './routes/town.route.js';
 import { swaggerRouter } from './routes/swagger.route.js';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import packageJson from '../package.json' with { type: 'json' };
 
 dayjs.extend(customParseFormat);
 
@@ -46,6 +47,10 @@ app.use((req, res, next) => {
 });
 
 // Routes
+app.get('/', (_req, res) => {
+  res.json({ version: packageJson.version });
+});
+
 app.use('/update', updateRouter);
 app.use('/maps', mapsRouter);
 app.use('/town', townRouter);
