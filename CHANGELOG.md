@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.11](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.10...v1.0.11) (2026-02-12)
+
+
+### Bug Fixes
+
+* Display current version on GET / ([670a8a1](https://github.com/Zenoo/zen-hordes-server/commit/670a8a133442f9c3b3a6e6a83004aaec0e6a0666))
+
 ## [1.0.10](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.9...v1.0.10) (2026-02-12)
 
 
