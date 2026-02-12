@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.10](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.9...v1.0.10) (2026-02-12)
+
+
+### Bug Fixes
+
+* Use PAT for version control ([dc16a89](https://github.com/Zenoo/zen-hordes-server/commit/dc16a898dc98b3f96dd3ba916b8c521a6a0df4e3))
+
 ## [1.0.9](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.8...v1.0.9) (2026-02-11)
 
 
