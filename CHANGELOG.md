@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.12](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.11...v1.0.12) (2026-02-13)
+
+
+### Bug Fixes
+
+* Add reminders for next steps ([a090310](https://github.com/Zenoo/zen-hordes-server/commit/a09031080bdc58d555882948bb83c59fdddb7a0e))
+* Update adjascent zones updated tag ([bf4233e](https://github.com/Zenoo/zen-hordes-server/commit/bf4233e270aa355021035e5893f2276ca542861c))
+* Upsert scav zones ([3fb013a](https://github.com/Zenoo/zen-hordes-server/commit/3fb013a1a6b52cab72470222fd1a612033208225))
+
 ## [1.0.11](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.10...v1.0.11) (2026-02-12)
 
 
