@@ -178,6 +178,8 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
               },
               data: {
                 depleted: data.scavRadar[direction],
+                updatedAt: new Date(),
+                updatedById: user.id,
               },
             })
           );
