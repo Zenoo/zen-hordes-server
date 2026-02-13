@@ -126,6 +126,10 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
 
     await createOrUpdateTowns(createMHApi(key), [townId]);
 
+    // TODO: check if the user is actually in the town
+    // if he's not, and players are less than 40, check the API again
+    // otherwise, just return an error saying the user is not in the town
+
     const town = await prisma.town.findUnique({
       where: {
         id: townId,

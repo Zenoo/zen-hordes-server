@@ -92,6 +92,10 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
     const user = await createUser(api, data.userId, data.key);
     await createOrUpdateTowns(api, [data.townId]);
 
+    // TODO: check if the user is actually in the town
+    // if he's not, and players are less than 40, check the API again
+    // otherwise, just return an error saying the user is not in the town
+
     let dangerLevel = 0;
     if (data.zombies > 5) {
       dangerLevel = 3;
@@ -143,6 +147,8 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
         },
       },
     });
+
+    // TODO: Update citizen's position
 
     // Update adjacent zones depletion status based on scavenger radar
     if (data.scavRadar) {
