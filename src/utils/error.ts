@@ -28,7 +28,6 @@ export const validate = <T extends z.ZodType>(schema: T, req: Request): z.infer<
 };
 
 export const sendError = (res: Response<ErrorResponse>, error: unknown) => {
-  console.error(error);
   if (!(error instanceof Error)) {
     throw error;
   }

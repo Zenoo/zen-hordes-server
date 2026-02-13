@@ -167,8 +167,14 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
               break;
           }
 
+          const payload = {
+            depleted: data.scavRadar[direction],
+            updatedAt: new Date(),
+            updatedById: user.id,
+          };
+
           updates.push(
-            prisma.zone.update({
+            prisma.zone.upsert({
               where: {
                 townId_x_y: {
                   townId: data.townId,
@@ -176,11 +182,13 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
                   y: adjacentY,
                 },
               },
-              data: {
-                depleted: data.scavRadar[direction],
-                updatedAt: new Date(),
-                updatedById: user.id,
+              create: {
+                townId: data.townId,
+                x: adjacentX,
+                y: adjacentY,
+                ...payload,
               },
+              update: payload,
             })
           );
         }
