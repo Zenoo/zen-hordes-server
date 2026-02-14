@@ -28,7 +28,7 @@ const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number])
 
 const mapZoneData = (
   townId: number,
-  city: JSONGameObject['city'],
+  city: Pick<NonNullable<JSONGameObject['city']>, 'x' | 'y'> | undefined,
   _zone: NonNullable<JSONGameObject['zones']>[number]
 ): ZoneCreateManyInput => {
   const zone = _zone as typeof _zone & {
@@ -58,7 +58,7 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
     mapId: townId,
     fields: `
       conspiracy,
-      city.fields(bank,water,chaos,devast,door),
+      city.fields(x,y,bank,water,chaos,devast,door),
       zones.fields(
         x,
         y,
