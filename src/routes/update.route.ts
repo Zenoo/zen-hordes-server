@@ -90,7 +90,7 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
 
     // Create user & town if needed
     const user = await createUser(api, data.userId, data.key);
-    await createOrUpdateTowns(api, [data.townId]);
+    await createOrUpdateTowns(api, [data.townId], data.userId);
 
     // TODO: check if the user is actually in the town
     // if he's not, and players are less than 40, check the API again

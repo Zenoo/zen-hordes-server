@@ -127,6 +127,7 @@ describe('Maps Route', () => {
       .post('/maps')
       .send({
         key: 'test-key',
+        userId: 1,
         townIds: [100, 101],
       })
       .expect(200);
@@ -188,6 +189,7 @@ describe('Maps Route', () => {
       .post('/maps')
       .send({
         key: 'test-key',
+        userId: 1,
         townIds: [100, 101],
       })
       .expect(200);
@@ -217,6 +219,7 @@ describe('Maps Route', () => {
       .post('/maps')
       .send({
         key: 'test-key',
+        userId: 1,
         townIds: [100],
       })
       .expect(200);
@@ -228,6 +231,7 @@ describe('Maps Route', () => {
       .post('/maps')
       .send({
         key: 'test-key',
+        userId: 1,
         townIds: [100],
       })
       .expect(200);
@@ -245,6 +249,7 @@ describe('Maps Route', () => {
       .post('/maps')
       .send({
         key: 'test-key',
+        userId: 1,
         townIds: [100],
       })
       .expect(200);
@@ -256,6 +261,7 @@ describe('Maps Route', () => {
       .post('/maps')
       .send({
         key: 'test-key',
+        userId: 1,
         townIds: [100, 101],
       })
       .expect(200);
@@ -277,6 +283,7 @@ describe('Maps Route', () => {
       .post('/maps')
       .send({
         key: 'test-key',
+        userId: 1,
         townIds: [999],
       })
       .expect(200);

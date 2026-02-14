@@ -113,7 +113,7 @@ const router = Router();
 
 router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResponse>) => {
   try {
-    const { townId, key } = validate(requestSchema, req);
+    const { townId, key, userId } = validate(requestSchema, req);
 
     // Create cache key (by townId only since data is same for all citizens)
     const cacheKey = `town:${townId}` as const;
@@ -124,7 +124,7 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
       return res.json(cached);
     }
 
-    await createOrUpdateTowns(createMHApi(key), [townId]);
+    await createOrUpdateTowns(createMHApi(key), [townId], userId);
 
     // TODO: check if the user is actually in the town
     // if he's not, and players are less than 40, check the API again

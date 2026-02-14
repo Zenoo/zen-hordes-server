@@ -30,7 +30,7 @@ type FindUniqueArgs = {
     };
   };
   include?: {
-    citizens?: boolean;
+    citizens?: boolean | { include?: { user?: boolean } };
     zones?: boolean | { include?: { items?: boolean } };
     bank?: boolean;
     items?: boolean;
@@ -41,7 +41,7 @@ type FindManyArgs = {
   where?: Record<string, unknown>;
   select?: Record<string, unknown>;
   include?: {
-    citizens?: boolean | { select?: Record<string, boolean> };
+    citizens?: boolean | { select?: Record<string, boolean>; include?: { user?: boolean } };
     zones?: boolean | { select?: Record<string, boolean> };
     bank?: boolean;
     items?: boolean;
@@ -164,6 +164,13 @@ const createMockModel = (storeName: keyof MockDataStore) => ({
     if (include) {
       if (include.citizens) {
         result.citizens = Array.from(mockData.citizens.values()).filter((c) => c.townId === record?.id);
+        // Handle nested include for user
+        if (typeof include.citizens === 'object' && include.citizens.include?.user) {
+          result.citizens = (result.citizens as MockRecord[]).map((c) => ({
+            ...c,
+            user: mockData.users.get(c.userId as number),
+          }));
+        }
       }
       if (include.zones) {
         result.zones = Array.from(mockData.zones.values()).filter((z) => z.townId === record?.id);
@@ -207,6 +214,13 @@ const createMockModel = (storeName: keyof MockDataStore) => ({
       if (include) {
         if (include.citizens) {
           result.citizens = Array.from(mockData.citizens.values()).filter((c) => c.townId === record.id);
+          // Handle nested include for user
+          if (typeof include.citizens === 'object' && include.citizens.include?.user) {
+            result.citizens = (result.citizens as MockRecord[]).map((c) => ({
+              ...c,
+              user: mockData.users.get(c.userId as number),
+            }));
+          }
         }
         if (include.zones) {
           result.zones = Array.from(mockData.zones.values()).filter((z) => z.townId === record.id);

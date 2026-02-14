@@ -12,6 +12,7 @@ const requestSchema = registry.register(
   'MapsRequest',
   z.object({
     key: z.string().min(1).openapi({ description: 'User key for MyHordes API authentication' }),
+    userId: z.number().openapi({ description: 'ID of the user requesting the data' }),
     townIds: z.array(z.number()).openapi({ description: 'List of town IDs to fetch zones for' }),
   })
 );
@@ -67,7 +68,7 @@ const router = Router();
 
 router.post('/', async (req: Request, res: Response<MapsResponseType | ErrorResponse>) => {
   try {
-    const { townIds, key } = validate(requestSchema, req);
+    const { townIds, key, userId } = validate(requestSchema, req);
 
     type TownData = MapsResponseType['towns'][number];
 
@@ -90,7 +91,7 @@ router.post('/', async (req: Request, res: Response<MapsResponseType | ErrorResp
     if (uncachedTownIds.length > 0) {
       const api = createMHApi(key);
 
-      await createOrUpdateTowns(api, uncachedTownIds);
+      await createOrUpdateTowns(api, uncachedTownIds, userId);
 
       fetchedTowns = await prisma.town.findMany({
         where: {

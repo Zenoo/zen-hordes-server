@@ -1,7 +1,8 @@
-import { Prisma } from '../generated/prisma/client.js';
 import type { Request, Response } from 'express';
-import { ErrorResponse } from './api/openapi-schemas.js';
 import { z } from 'zod';
+import { DISCORD } from '../context.js';
+import { Prisma } from '../generated/prisma/client.js';
+import { ErrorResponse } from './api/openapi-schemas.js';
 
 export class ValidationError extends Error {
   constructor(
@@ -52,5 +53,13 @@ export const sendError = (res: Response<ErrorResponse>, error: unknown) => {
     res.status(500).send({ success: false, error: `Error: ${error.message.substring(0, 25)}` });
   } else {
     res.status(500).send({ success: false, error: `Unknown error: ${String(error).substring(0, 25)}` });
+  }
+
+  if (!(error instanceof ValidationError)) {
+    try {
+      DISCORD().sendError(error, res);
+    } catch (discordError) {
+      console.error(discordError);
+    }
   }
 };

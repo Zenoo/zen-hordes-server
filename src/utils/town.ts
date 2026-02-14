@@ -4,6 +4,7 @@ import { ZoneCreateManyInput, ZoneItemCreateManyInput } from '../generated/prism
 import { Api, JSONGameObject } from './api/mh-api.js';
 import { prisma } from './prisma.js';
 import { updateCacheAfterHourlyUpdate } from './cache-update.js';
+import { LOGGER } from '../context.js';
 
 const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number]) => {
   const jobIcon = citizen.job?.uid;
@@ -228,7 +229,7 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
   });
 };
 
-export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[]) => {
+export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[], userId: number) => {
   const towns = await prisma.town.findMany({
     where: { id: { in: ids } },
     select: { id: true, lastUpdate: true },
@@ -245,11 +246,11 @@ export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[]) => {
       continue;
     }
 
-    await createTownFromApi(api, id);
+    await createTownFromApi(api, id, userId);
   }
 };
 
-const createTownFromApi = async (api: Api<unknown>, id: number) => {
+const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) => {
   let town: { id: number; lastUpdate: Date | null } | null = null;
 
   // Fetch town from MyHordes API
@@ -318,11 +319,13 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
       ? (data.city.type as TownType)
       : TownType.REMOTE;
 
+  const townName = data.city?.name ?? 'Unknown';
+
   // Create town in the database
   town = await prisma.town.create({
     data: {
       id: data.id,
-      name: data.city?.name ?? 'Unknown',
+      name: townName,
       start,
       season: data.season ?? 0,
       phase,
@@ -344,6 +347,8 @@ const createTownFromApi = async (api: Api<unknown>, id: number) => {
     },
     select: { id: true, lastUpdate: true },
   });
+
+  LOGGER.log(`User ${userId} created town ${town.id} - ${townName} (started at ${start.toISOString()})`);
 
   // Create zones
   if (data.zones?.length) {

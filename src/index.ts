@@ -1,18 +1,31 @@
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
 import compression from 'compression';
-import rateLimit from 'express-rate-limit';
-import { updateRouter } from './routes/update.route.js';
-import { mapsRouter } from './routes/maps.route.js';
-import { townRouter } from './routes/town.route.js';
-import { swaggerRouter } from './routes/swagger.route.js';
+import cors from 'cors';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import 'dotenv/config';
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import packageJson from '../package.json' with { type: 'json' };
+import { LOGGER } from './context.js';
+import { mapsRouter } from './routes/maps.route.js';
+import { swaggerRouter } from './routes/swagger.route.js';
+import { townRouter } from './routes/town.route.js';
+import { updateRouter } from './routes/update.route.js';
 
 dayjs.extend(customParseFormat);
+
+// Validate required environment variables
+const validateEnv = (): void => {
+  const requiredEnvVars = ['API_APPKEY', 'DATABASE_URL'] as const;
+  const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+  }
+};
+
+validateEnv();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -58,21 +71,21 @@ app.use('/swagger', swaggerRouter);
 
 // Start server
 const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Swagger documentation available at http://localhost:${PORT}/swagger`);
+  LOGGER.log(`Server is running on port ${PORT}`);
+  LOGGER.log(`Swagger documentation available at http://localhost:${PORT}/swagger`);
 });
 
 // Graceful shutdown
 const gracefulShutdown = (signal: string) => {
-  console.log(`\n${signal} received. Closing server gracefully...`);
+  LOGGER.log(`\n${signal} received. Closing server gracefully...`);
   server.close(() => {
-    console.log('Server closed. Exiting process.');
+    LOGGER.log('Server closed. Exiting process.');
     process.exit(0);
   });
 
   // Force shutdown after 10 seconds
   setTimeout(() => {
-    console.error('Forced shutdown after timeout');
+    LOGGER.error('Forced shutdown after timeout');
     process.exit(1);
   }, 10000);
 };
