@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.14](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.13...v1.0.14) (2026-02-14)
+
+
+### Bug Fixes
+
+* Missing x,y city data on update ([72b2ae3](https://github.com/Zenoo/zen-hordes-server/commit/72b2ae3f2c6bdd77f513e781bea8bd8235e767ee))
+
 ## [1.0.13](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.12...v1.0.13) (2026-02-14)
 
 
