@@ -1,12 +1,12 @@
 import { Request, Response, Router } from 'express';
 import { z } from 'zod';
 import { createMHApi } from '../utils/api/mh-api.helper.js';
-import { registry } from '../utils/api/openapi.js';
 import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas.js';
+import { registry } from '../utils/api/openapi.js';
 import { updateCacheAfterUserUpdate } from '../utils/cache-update.js';
 import { sendError, validate } from '../utils/error.js';
 import { prisma } from '../utils/prisma.js';
-import { createOrUpdateTowns } from '../utils/town.js';
+import { checkUserInTown, createOrUpdateTowns } from '../utils/town.js';
 import { createUser } from '../utils/user.js';
 
 const requestSchema = registry.register(
@@ -78,23 +78,12 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
     // Initialize MH API with credentials
     const api = createMHApi(data.key);
 
-    // Fetch API status
-    const status = await api.json.statusList();
-
-    const available = !status.data.attack && !status.data.maintain;
-
-    if (!available) {
-      res.status(503).json({ success: false, error: 'MyHordes API is currently unavailable' });
-      return;
-    }
-
     // Create user & town if needed
     const user = await createUser(api, data.userId, data.key);
     await createOrUpdateTowns(api, [data.townId], data.userId);
 
-    // TODO: check if the user is actually in the town
-    // if he's not, and players are less than 40, check the API again
-    // otherwise, just return an error saying the user is not in the town
+    // Check if the user is actually in the town
+    await checkUserInTown(api, data.townId, data.userId);
 
     let dangerLevel = 0;
     if (data.zombies > 5) {
@@ -148,7 +137,19 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
       },
     });
 
-    // TODO: Update citizen's position
+    // Update citizen's position
+    await prisma.citizen.update({
+      where: {
+        userId_townId: {
+          userId: data.userId,
+          townId: data.townId,
+        },
+      },
+      data: {
+        x: data.x,
+        y: data.y,
+      },
+    });
 
     // Update adjacent zones depletion status based on scavenger radar
     if (data.scavRadar) {

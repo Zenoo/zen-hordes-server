@@ -4,24 +4,57 @@ import { createTestApp } from '../helpers/test-app.js';
 import { testPrisma } from '../setup.js';
 import { getCached } from '../../src/utils/cache.js';
 
-vi.mock('../../src/utils/api/mh-api.helper.js', () => ({
-  createMHApi: vi.fn(() => ({
-    json: {
-      statusList: vi.fn(async () => ({
-        data: { attack: false, maintain: false },
-      })),
-    },
-  })),
-}));
+const mockGetJson2 = vi.fn();
+const mockStatusList = vi.fn();
 
-vi.mock('../../src/utils/town.js', () => ({
-  createOrUpdateTowns: vi.fn(async () => {}),
-}));
+vi.mock('../../src/utils/api/mh-api.helper.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/utils/api/mh-api.helper.js')>();
+  return {
+    ...actual,
+    createMHApi: vi.fn(() => ({
+      json: {
+        statusList: mockStatusList,
+        getJson2: mockGetJson2,
+      },
+    })),
+  };
+});
 
 describe('Maps Route', () => {
   const app = createTestApp();
 
   beforeEach(async () => {
+    vi.clearAllMocks();
+
+    // Mock API responses for createOrUpdateTowns
+    mockStatusList.mockResolvedValue({
+      data: { attack: false, maintain: false },
+    });
+
+    mockGetJson2.mockResolvedValue({
+      data: {
+        id: 100,
+        date: '2026-01-01 00:00:00',
+        season: 1,
+        phase: 'NATIVE',
+        wid: 10,
+        hei: 10,
+        city: {
+          name: 'Test Town',
+          x: 0,
+          y: 0,
+          type: 'SMALL',
+          bank: [],
+          water: 0,
+          chaos: 0,
+          devast: false,
+          door: false,
+        },
+        zones: [],
+        citizens: [],
+      },
+    });
+
     // Create test users
     await testPrisma.user.create({
       data: {

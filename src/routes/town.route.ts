@@ -6,7 +6,7 @@ import { ErrorResponse, routeDetails } from '../utils/api/openapi-schemas.js';
 import { getCached, setCached } from '../utils/cache.js';
 import { sendError, validate } from '../utils/error.js';
 import { prisma } from '../utils/prisma.js';
-import { createOrUpdateTowns } from '../utils/town.js';
+import { checkUserInTown, createOrUpdateTowns } from '../utils/town.js';
 
 const requestSchema = registry.register(
   'TownRequest',
@@ -124,11 +124,11 @@ router.post('/', async (req: Request, res: Response<TownResponseType | ErrorResp
       return res.json(cached);
     }
 
-    await createOrUpdateTowns(createMHApi(key), [townId], userId);
+    const api = createMHApi(key);
+    await createOrUpdateTowns(api, [townId], userId);
 
-    // TODO: check if the user is actually in the town
-    // if he's not, and players are less than 40, check the API again
-    // otherwise, just return an error saying the user is not in the town
+    // Check if the user is actually in the town
+    await checkUserInTown(api, townId, userId);
 
     const town = await prisma.town.findUnique({
       where: {

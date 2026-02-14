@@ -5,6 +5,8 @@ import { Api, JSONGameObject } from './api/mh-api.js';
 import { prisma } from './prisma.js';
 import { updateCacheAfterHourlyUpdate } from './cache-update.js';
 import { LOGGER } from '../context.js';
+import { checkApiAvailability } from './api/mh-api.helper.js';
+import { ExpectedError } from './error.js';
 
 const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number]) => {
   const jobIcon = citizen.job?.uid;
@@ -53,7 +55,9 @@ const mapZoneData = (
   };
 };
 
-const updateCity = async (api: Api<unknown>, townId: number) => {
+export const updateCity = async (api: Api<unknown>, townId: number) => {
+  await checkApiAvailability(api);
+
   // Fetch city data from MyHordes API
   const { data } = await api.json.getJson2({
     mapId: townId,
@@ -200,6 +204,15 @@ const updateCity = async (api: Api<unknown>, townId: number) => {
       const existingCitizen = existingCitizens.find((ec) => ec.userId === citizen.id);
 
       if (!existingCitizen) {
+        // New citizen in the town, create it
+        await prisma.citizen.create({
+          data: {
+            userId: citizen.id ?? 0,
+            townId,
+            x: citizen.x ?? 0,
+            y: citizen.y ?? 0,
+          },
+        });
         continue;
       }
 
@@ -252,6 +265,9 @@ export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[], user
 
 const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) => {
   let town: { id: number; lastUpdate: Date | null } | null = null;
+
+  // Check API availability
+  await checkApiAvailability(api);
 
   // Fetch town from MyHordes API
   const { data } = await api.json.getJson2({
@@ -434,4 +450,48 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
   }
 
   return town;
+};
+
+export const checkUserInTown = async (api: Api<unknown>, townId: number, userId: number) => {
+  // Check if the user is actually in the town
+  const citizen = await prisma.citizen.findUnique({
+    where: {
+      userId_townId: {
+        userId,
+        townId,
+      },
+    },
+  });
+
+  // If he's not
+  if (!citizen) {
+    const townCitizensCount = await prisma.citizen.count({
+      where: {
+        townId,
+      },
+    });
+
+    // And there are less than 40 players (town not full)
+    if (townCitizensCount < 40) {
+      // Check the API again to see if the user just entered the town
+      await updateCity(api, townId);
+
+      const newCitizen = await prisma.citizen.findUnique({
+        where: {
+          userId_townId: {
+            userId,
+            townId,
+          },
+        },
+      });
+
+      if (!newCitizen) {
+        // If he's still not in the town, prevent access
+        throw new ExpectedError('User is not a citizen of the town');
+      }
+    } else {
+      // Town is full, no new citizens can enter, prevent access
+      throw new ExpectedError('User is not a citizen of the town');
+    }
+  }
 };

@@ -4,6 +4,15 @@ import { DISCORD } from '../context.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { ErrorResponse } from './api/openapi-schemas.js';
 
+export class ExpectedError extends Error {
+  constructor(
+    message = '',
+    public statusCode: number = 400
+  ) {
+    super(message);
+  }
+}
+
 export class ValidationError extends Error {
   constructor(
     public statusCode: number,
@@ -35,6 +44,8 @@ export const sendError = (res: Response<ErrorResponse>, error: unknown) => {
 
   if (error instanceof ValidationError) {
     res.status(error.statusCode).send(error.response);
+  } else if (error instanceof ExpectedError) {
+    res.status(error.statusCode).send({ success: false, error: error.message });
   } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
     res.status(500).send({ success: false, error: `Prisma Client Known Request Error: ${error.code}` });
   } else if (error instanceof Prisma.PrismaClientUnknownRequestError) {
@@ -55,7 +66,7 @@ export const sendError = (res: Response<ErrorResponse>, error: unknown) => {
     res.status(500).send({ success: false, error: `Unknown error: ${String(error).substring(0, 25)}` });
   }
 
-  if (!(error instanceof ValidationError)) {
+  if (!(error instanceof ValidationError) && !(error instanceof ExpectedError)) {
     try {
       DISCORD().sendError(error, res);
     } catch (discordError) {

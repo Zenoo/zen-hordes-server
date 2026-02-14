@@ -3,41 +3,68 @@ import request from 'supertest';
 import { createTestApp } from '../helpers/test-app.js';
 import { testPrisma } from '../setup.js';
 
-vi.mock('../../src/utils/api/mh-api.helper.js', () => ({
-  createMHApi: vi.fn(() => ({
-    json: {
-      statusList: vi.fn(async () => ({
-        data: { attack: false, maintain: false },
-      })),
-      me: vi.fn(async () => ({
-        data: {
-          id: 1,
-          name: 'Test User',
-          locale: 'en',
-          avatar: null,
-        },
-      })),
-    },
-  })),
-}));
+const mockGetJson = vi.fn();
+const mockGetJson2 = vi.fn();
+const mockStatusList = vi.fn();
 
-vi.mock('../../src/utils/town.js', () => ({
-  createOrUpdateTowns: vi.fn(async () => {}),
-}));
-
-vi.mock('../../src/utils/user.js', () => ({
-  createUser: vi.fn(async () => ({
-    id: 1,
-    name: 'Test User',
-    locale: 'EN',
-    key: 'test-key',
-  })),
-}));
+vi.mock('../../src/utils/api/mh-api.helper.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/utils/api/mh-api.helper.js')>();
+  return {
+    ...actual,
+    createMHApi: vi.fn(() => ({
+      json: {
+        statusList: mockStatusList,
+        getJson: mockGetJson,
+        getJson2: mockGetJson2,
+      },
+    })),
+  };
+});
 
 describe('Update Route', () => {
   const app = createTestApp();
 
   beforeEach(async () => {
+    vi.clearAllMocks();
+
+    // Mock API responses
+    mockStatusList.mockResolvedValue({
+      data: { attack: false, maintain: false },
+    });
+
+    mockGetJson.mockResolvedValue({
+      data: {
+        id: 1,
+        name: 'Test User',
+        locale: 'en',
+        avatar: null,
+      },
+    });
+
+    mockGetJson2.mockResolvedValue({
+      data: {
+        id: 100,
+        date: '2026-01-01 00:00:00',
+        season: 1,
+        phase: 'NATIVE',
+        wid: 10,
+        hei: 10,
+        city: {
+          name: 'Test Town',
+          x: 0,
+          y: 0,
+          type: 'SMALL',
+          bank: [],
+          water: 0,
+          chaos: 0,
+          devast: false,
+          door: false,
+        },
+        zones: [],
+        citizens: [{ id: 1, x: 0, y: 0 }],
+      },
+    });
+
     // Create test user
     await testPrisma.user.create({
       data: {
@@ -314,40 +341,30 @@ describe('Update Route', () => {
   });
 
   it('should return 503 when MyHordes API is unavailable', async () => {
-    // Import and mock the API helper to return unavailable status for this test
-    const { createMHApi } = await import('../../src/utils/api/mh-api.helper.js');
-    const mockCreateMHApi = vi.mocked(createMHApi);
+    // Use a new user that doesn't exist in DB to force API call in createUser
+    // Reset mocks and reconfigure for this specific test
+    mockStatusList.mockReset();
+    mockGetJson.mockReset();
+    mockGetJson2.mockReset();
 
-    mockCreateMHApi.mockReturnValueOnce({
-      json: {
-        statusList: vi.fn(async () => ({
-          data: { attack: true, maintain: false },
-        })),
-        me: vi.fn(async () => ({
-          data: {
-            id: 1,
-            name: 'Test User',
-            locale: 'en',
-            avatar: null,
-          },
-        })),
-      },
-    } as never);
+    // Mock API to return attack status for all calls
+    mockStatusList.mockResolvedValue({
+      data: { attack: true, maintain: false },
+    });
 
-    const response = await request(app)
-      .post('/update')
-      .send({
-        key: 'test-key',
-        townId: 100,
-        userId: 1,
-        x: 6,
-        y: 6,
-        zombies: 1,
-        depleted: false,
-        items: [],
-      })
-      .expect(503);
+    const response = await request(app).post('/update').send({
+      key: 'test-key',
+      townId: 100,
+      userId: 888, // User that doesn't exist
+      x: 6,
+      y: 6,
+      zombies: 1,
+      depleted: false,
+      items: [],
+    });
 
+    // Should return 503 from createUser checking API availability
+    expect(response.status).toBe(503);
     expect(response.body).toMatchObject({
       success: false,
       error: 'MyHordes API is currently unavailable',
@@ -398,5 +415,243 @@ describe('Update Route', () => {
     expect(zone).toBeDefined();
     expect(zone?.dangerLevel).toBe(0);
     expect(zone?.items).toHaveLength(0);
+  });
+
+  it('should pass when user is a citizen of the town', async () => {
+    await request(app)
+      .post('/update')
+      .send({
+        key: 'test-key',
+        townId: 100,
+        userId: 1,
+        x: 8,
+        y: 8,
+        zombies: 2,
+        depleted: false,
+        items: [],
+      })
+      .expect(200);
+
+    const zone = await testPrisma.zone.findUnique({
+      where: {
+        townId_x_y: {
+          townId: 100,
+          x: 8,
+          y: 8,
+        },
+      },
+    });
+
+    expect(zone).toBeDefined();
+    expect(zone?.zombies).toBe(2);
+  });
+
+  it('should reject when user is not a citizen and town is full (40+ citizens)', async () => {
+    // Create a town with 40 citizens
+    for (let i = 2; i <= 41; i++) {
+      await testPrisma.user.create({
+        data: {
+          id: i,
+          name: `User ${i}`,
+          locale: 'EN',
+          key: `key-${i}`,
+        },
+      });
+    }
+
+    const citizens = Array.from({ length: 40 }, (_, i) => ({
+      userId: i + 2,
+      townId: 100,
+      x: 0,
+      y: 0,
+    }));
+
+    for (const citizen of citizens) {
+      await testPrisma.citizen.create({ data: citizen });
+    }
+
+    // Create user 999 first to avoid API call in createUser
+    await testPrisma.user.create({
+      data: {
+        id: 999,
+        name: 'Unknown User',
+        locale: 'EN',
+        key: 'unknown-key',
+      },
+    });
+
+    const response = await request(app)
+      .post('/update')
+      .send({
+        key: 'test-key',
+        townId: 100,
+        userId: 999, // User not in town
+        x: 9,
+        y: 9,
+        zombies: 3,
+        depleted: false,
+        items: [],
+      })
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      success: false,
+      error: 'User is not a citizen of the town',
+    });
+
+    // Verify zone was NOT created
+    const zone = await testPrisma.zone.findUnique({
+      where: {
+        townId_x_y: {
+          townId: 100,
+          x: 9,
+          y: 9,
+        },
+      },
+    });
+
+    expect(zone).toBeNull();
+  });
+
+  it('should reject when user not in town, town not full, but API confirms user not in town', async () => {
+    // Town has only 1 citizen (less than 40)
+    // Mock API responses for user 999
+    mockGetJson.mockResolvedValueOnce({
+      data: {
+        id: 999,
+        name: 'Unknown User',
+        locale: 'en',
+        avatar: null,
+      },
+    });
+
+    // Mock getJson2 to return citizens list without user 999
+    mockGetJson2.mockResolvedValueOnce({
+      data: {
+        id: 100,
+        city: {
+          bank: [],
+          water: 0,
+          chaos: 0,
+          devast: false,
+          door: false,
+        },
+        zones: [],
+        citizens: [{ id: 1, x: 0, y: 0 }], // User 999 not in list
+      },
+    });
+
+    const response = await request(app)
+      .post('/update')
+      .send({
+        key: 'test-key',
+        townId: 100,
+        userId: 999, // User not in town
+        x: 10,
+        y: 10,
+        zombies: 4,
+        depleted: false,
+        items: [],
+      })
+      .expect(400);
+
+    expect(response.body).toMatchObject({
+      success: false,
+      error: 'User is not a citizen of the town',
+    });
+
+    // Verify zone was NOT created
+    const zone = await testPrisma.zone.findUnique({
+      where: {
+        townId_x_y: {
+          townId: 100,
+          x: 10,
+          y: 10,
+        },
+      },
+    });
+
+    expect(zone).toBeNull();
+  });
+
+  it('should pass when user not initially in town, town not full, and API adds user', async () => {
+    // Create user 999 first
+    await testPrisma.user.create({
+      data: {
+        id: 999,
+        name: 'New User',
+        locale: 'EN',
+        key: 'new-key',
+      },
+    });
+
+    // Mock API responses for user 999
+    mockGetJson.mockResolvedValueOnce({
+      data: {
+        id: 999,
+        name: 'New User',
+        locale: 'en',
+        avatar: null,
+      },
+    });
+
+    // Mock getJson2 to return citizens list with user 999 added
+    mockGetJson2.mockResolvedValueOnce({
+      data: {
+        id: 100,
+        city: {
+          bank: [],
+          water: 0,
+          chaos: 0,
+          devast: false,
+          door: false,
+        },
+        zones: [],
+        citizens: [
+          { id: 1, x: 0, y: 0 },
+          { id: 999, x: 0, y: 0 }, // User 999 now in town
+        ],
+      },
+    });
+
+    await request(app)
+      .post('/update')
+      .send({
+        key: 'test-key',
+        townId: 100,
+        userId: 999,
+        x: 11,
+        y: 11,
+        zombies: 5,
+        depleted: false,
+        items: [],
+      })
+      .expect(200);
+
+    // Verify zone WAS created
+    const zone = await testPrisma.zone.findUnique({
+      where: {
+        townId_x_y: {
+          townId: 100,
+          x: 11,
+          y: 11,
+        },
+      },
+    });
+
+    expect(zone).toBeDefined();
+    expect(zone?.zombies).toBe(5);
+
+    // Verify citizen was created
+    const citizen = await testPrisma.citizen.findUnique({
+      where: {
+        userId_townId: {
+          userId: 999,
+          townId: 100,
+        },
+      },
+    });
+
+    expect(citizen).toBeDefined();
   });
 });

@@ -49,7 +49,13 @@ type FindManyArgs = {
 };
 
 type UpdateArgs = {
-  where: { id: number };
+  where: {
+    id?: number;
+    userId_townId?: {
+      userId: number;
+      townId: number;
+    };
+  };
   data: MockRecord;
 };
 
@@ -278,10 +284,32 @@ const createMockModel = (storeName: keyof MockDataStore) => ({
     });
   }),
   update: vi.fn(async ({ where, data }: UpdateArgs) => {
-    const existing = mockData[storeName].get(where.id);
+    let existing: MockRecord | undefined;
+
+    // Handle composite keys
+    if (where.userId_townId) {
+      existing = Array.from(mockData[storeName].values()).find(
+        (r) => r.userId === where.userId_townId?.userId && r.townId === where.userId_townId?.townId
+      );
+    } else if (where.id !== undefined) {
+      existing = mockData[storeName].get(where.id);
+    }
+
     if (!existing) throw new Error('Record not found');
     const updated: MockRecord = { ...existing, ...data };
-    mockData[storeName].set(where.id, updated);
+
+    // Update in map with the correct key
+    if (where.id !== undefined) {
+      mockData[storeName].set(where.id, updated);
+    } else {
+      // For composite keys, we need to find and update the record
+      const entries = Array.from(mockData[storeName].entries());
+      const [key] = entries.find(([, r]) => r === existing) ?? [];
+      if (key !== undefined) {
+        mockData[storeName].set(key as number, updated);
+      }
+    }
+
     return updated;
   }),
   upsert: vi.fn(async ({ where, create, update }: UpsertArgs) => {
@@ -351,10 +379,79 @@ const createMockModel = (storeName: keyof MockDataStore) => ({
     mockData[storeName].delete(where.id);
     return record;
   }),
-  deleteMany: vi.fn(async () => {
-    const count = mockData[storeName].size;
-    mockData[storeName].clear();
+  count: vi.fn(async ({ where }: { where?: Record<string, unknown> } = {}) => {
+    let records = Array.from(mockData[storeName].values());
+
+    // Filter by where clause
+    if (where) {
+      records = records.filter((record) => {
+        return Object.entries(where).every(([key, value]) => {
+          if (typeof value === 'object' && value !== null && 'in' in value) {
+            const inArray = (value as { in: unknown[] }).in;
+            return inArray.includes(record[key]);
+          }
+          return record[key] === value;
+        });
+      });
+    }
+
+    return records.length;
+  }),
+  deleteMany: vi.fn(async ({ where }: { where?: Record<string, unknown> } = {}) => {
+    let records = Array.from(mockData[storeName].entries());
+
+    // Filter by where clause
+    if (where) {
+      records = records.filter(([, record]) => {
+        return Object.entries(where).every(([key, value]) => {
+          if (typeof value === 'object' && value !== null && 'in' in value) {
+            const inArray = (value as { in: unknown[] }).in;
+            return inArray.includes(record[key]);
+          }
+          return record[key] === value;
+        });
+      });
+    }
+
+    // Delete all matching records
+    for (const [id] of records) {
+      mockData[storeName].delete(id);
+    }
+
+    const count = records.length;
     return { count };
+  }),
+  createMany: vi.fn(async ({ data }: { data: MockRecord[] }) => {
+    for (const itemData of data) {
+      const id = (itemData.id as number | undefined) || nextId[storeName]++;
+      const record: MockRecord = { ...itemData, id };
+      mockData[storeName].set(id, record);
+    }
+    return { count: data.length };
+  }),
+  updateMany: vi.fn(async ({ where, data }: { where?: Record<string, unknown>; data: MockRecord }) => {
+    let records = Array.from(mockData[storeName].entries());
+
+    // Filter by where clause
+    if (where) {
+      records = records.filter(([, record]) => {
+        return Object.entries(where).every(([key, value]) => {
+          if (typeof value === 'object' && value !== null && 'in' in value) {
+            const inArray = (value as { in: unknown[] }).in;
+            return inArray.includes(record[key]);
+          }
+          return record[key] === value;
+        });
+      });
+    }
+
+    // Update all matching records
+    for (const [id, record] of records) {
+      const updated: MockRecord = { ...record, ...data };
+      mockData[storeName].set(id, updated);
+    }
+
+    return { count: records.length };
   }),
 });
 

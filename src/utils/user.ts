@@ -1,4 +1,5 @@
 import { Locale } from '../generated/prisma/enums.js';
+import { checkApiAvailability } from './api/mh-api.helper.js';
 import { Api } from './api/mh-api.js';
 import { prisma } from './prisma.js';
 
@@ -11,6 +12,8 @@ export const createUser = async (api: Api<unknown>, id: number, key: string) => 
   if (user) {
     return user;
   }
+
+  await checkApiAvailability(api);
 
   // Fetch user from MyHordes API
   const { data } = await api.json.getJson({

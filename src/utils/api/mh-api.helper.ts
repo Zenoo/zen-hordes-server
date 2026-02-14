@@ -1,3 +1,4 @@
+import { ExpectedError } from '../error.js';
 import { Api } from './mh-api.js';
 
 /**
@@ -14,4 +15,15 @@ export const createMHApi = (userkey: string): Api<unknown> => {
   });
 
   return api;
+};
+
+export const checkApiAvailability = async (api: Api<unknown>) => {
+  // Fetch API status
+  const status = await api.json.statusList();
+
+  const available = !status.data.attack && !status.data.maintain;
+
+  if (!available) {
+    throw new ExpectedError('MyHordes API is currently unavailable', 503);
+  }
 };
