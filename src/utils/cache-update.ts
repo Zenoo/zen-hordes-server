@@ -45,9 +45,9 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
       const directions = ['east', 'north', 'west', 'south'] as const;
       const adjacentCoords = {
         east: { x: x + 1, y },
-        north: { x, y: y - 1 },
+        north: { x, y: y + 1 },
         west: { x: x - 1, y },
-        south: { x, y: y + 1 },
+        south: { x, y: y - 1 },
       };
 
       for (const direction of directions) {
