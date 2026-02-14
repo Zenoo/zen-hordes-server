@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.13](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.12...v1.0.13) (2026-02-14)
+
+
+### Bug Fixes
+
+* Wrong scav radar calculation in cache ([c653ca9](https://github.com/Zenoo/zen-hordes-server/commit/c653ca9b609d8a6694cbd5d2fcafa06769580bb2))
+
 ## [1.0.12](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.11...v1.0.12) (2026-02-13)
 
 
