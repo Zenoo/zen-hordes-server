@@ -73,7 +73,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
         items,
         building
       ),
-      citizens.fields(id,x,y)
+      citizens.fields(id,twinId,etwinId,name,locale,avatar,x,y)
     `.replace(/\s+/g, ''),
   });
 
@@ -207,8 +207,26 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
         // New citizen in the town, create it
         await prisma.citizen.create({
           data: {
-            userId: citizen.id ?? 0,
-            townId,
+            user: {
+              connectOrCreate: {
+                where: { id: citizen.id ?? 0 },
+                create: {
+                  id: citizen.id ?? 0,
+                  twinoidId: citizen.twinId,
+                  etwinId: citizen.etwinId,
+                  name: citizen.name ?? 'Unknown',
+                  locale:
+                    citizen.locale && Object.values(Locale).includes(citizen.locale as Locale)
+                      ? (citizen.locale as Locale)
+                      : Locale.EN,
+                  avatar: citizen.avatar,
+                  key: '',
+                },
+              },
+            },
+            town: {
+              connect: { id: townId },
+            },
             x: citizen.x ?? 0,
             y: citizen.y ?? 0,
           },
