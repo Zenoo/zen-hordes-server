@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.16](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.15...v1.0.16) (2026-02-15)
+
+
+### Bug Fixes
+
+* Create user when adding new citizen ([667a5fa](https://github.com/Zenoo/zen-hordes-server/commit/667a5fa8f9f592ce8945ef9c81cd30b8c1e83276))
+
 ## [1.0.15](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.14...v1.0.15) (2026-02-15)
 
 
