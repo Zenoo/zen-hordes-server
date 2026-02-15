@@ -5,14 +5,6 @@ import { townRouter } from '../../src/routes/town.route.js';
 import { mapsRouter } from '../../src/routes/maps.route.js';
 import { updateRouter } from '../../src/routes/update.route.js';
 
-// Mock the cache module
-vi.mock('../../src/utils/cache.js', async () => {
-  const actual = await vi.importActual<typeof import('../../src/utils/cache.js')>('../../src/utils/cache.js');
-  return {
-    ...actual,
-  };
-});
-
 // Mock the prisma instance with the test prisma
 vi.mock('../../src/utils/prisma.js', () => ({
   prisma: testPrisma,
