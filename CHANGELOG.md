@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.15](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.14...v1.0.15) (2026-02-15)
+
+
+### Bug Fixes
+
+* Check if user is in town before accessing data + Test without mocking local methods ([2a5fbba](https://github.com/Zenoo/zen-hordes-server/commit/2a5fbbac7944b36ef0dbfa14a4559ea4aa611aa4))
+* Send logs to Discord ([2aa2965](https://github.com/Zenoo/zen-hordes-server/commit/2aa29651ca3ef9c205ba4329bf6d29d97fb644b5))
+
 ## [1.0.14](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.13...v1.0.14) (2026-02-14)
 
 
