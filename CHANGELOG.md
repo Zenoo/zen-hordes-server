@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.19](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.18...v1.0.19) (2026-02-16)
+
+
+### Bug Fixes
+
+* Remove worker handling ([1529fcb](https://github.com/Zenoo/zen-hordes-server/commit/1529fcb18e3ae670636ffc3038d9eb327193a4e2))
+
 ## [1.0.18](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.17...v1.0.18) (2026-02-16)
 
 
