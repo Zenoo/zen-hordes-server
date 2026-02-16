@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.21](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.20...v1.0.21) (2026-02-16)
+
+
+### Bug Fixes
+
+* Test deployment ([ceca61d](https://github.com/Zenoo/zen-hordes-server/commit/ceca61db6d760e2879991639129bbd496f30c179))
+
 ## [1.0.20](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.19...v1.0.20) (2026-02-16)
 
 
