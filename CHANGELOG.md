@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.18](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.17...v1.0.18) (2026-02-16)
+
+
+### Bug Fixes
+
+* Display vesion in logs ([f45ea84](https://github.com/Zenoo/zen-hordes-server/commit/f45ea84815f590fdafede52fe54685f669a3cb64))
+
 ## [1.0.17](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.16...v1.0.17) (2026-02-16)
 
 
