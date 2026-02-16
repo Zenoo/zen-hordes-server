@@ -1,9 +1,7 @@
-import { isMainThread } from 'node:worker_threads';
 import { CONSOLE } from './logger/console.js';
-import { Logger } from './logger/index.js';
-import { PARENT_PORT } from './logger/parent-port.js';
-import { NetworkDiscordClient, NOOP_DISCORD_CLIENT } from './utils/DiscordUtils.js';
 import { DiscordLogHandler } from './logger/discord.js';
+import { Logger } from './logger/index.js';
+import { NetworkDiscordClient, NOOP_DISCORD_CLIENT } from './utils/DiscordUtils.js';
 import { ASYNC_DISPOSE } from './utils/dispose.js';
 
 export class ServerContext {
@@ -12,7 +10,7 @@ export class ServerContext {
   public logger = new Logger([CONSOLE]);
 
   public async init() {
-    const fallbackLogger = new Logger([isMainThread ? CONSOLE : PARENT_PORT]);
+    const fallbackLogger = new Logger([CONSOLE]);
 
     const webhhookUrl = process.env.WEBHOOK_LOGS;
     const [webhookId, webhookToken] = webhhookUrl ? webhhookUrl.split('/').slice(-2) : [undefined, undefined];
@@ -23,15 +21,10 @@ export class ServerContext {
       logger: fallbackLogger,
     });
 
-    let logger: Logger;
-    if (isMainThread) {
-      const discordLogHandler = new DiscordLogHandler(discord, (e: Error) => {
-        fallbackLogger.error(e);
-      });
-      logger = new Logger([CONSOLE, discordLogHandler]);
-    } else {
-      logger = fallbackLogger;
-    }
+    const discordLogHandler = new DiscordLogHandler(discord, (e: Error) => {
+      fallbackLogger.error(e);
+    });
+    const logger = new Logger([CONSOLE, discordLogHandler]);
 
     await this.logger.close();
 
