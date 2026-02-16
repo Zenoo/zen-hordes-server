@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.17](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.16...v1.0.17) (2026-02-16)
+
+
+### Bug Fixes
+
+* Trust proxies for rate limiter ([0ce9b22](https://github.com/Zenoo/zen-hordes-server/commit/0ce9b22902273888a2ca43e3d93c2bb4d1a7a9be))
+
 ## [1.0.16](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.15...v1.0.16) (2026-02-15)
 
 
