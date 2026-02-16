@@ -74,8 +74,8 @@ app.use('/swagger', swaggerRouter);
 
 // Start server
 const server = app.listen(PORT, () => {
-  LOGGER.log(`Server is running on port ${PORT}`);
-  LOGGER.log(`Swagger documentation available at http://localhost:${PORT}/swagger`);
+  LOGGER.log(`Server is running on port ${PORT}. Version: ${packageJson.version}`);
+  LOGGER.log(`Swagger documentation available at /swagger`);
 });
 
 // Graceful shutdown
