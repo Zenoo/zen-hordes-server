@@ -17,7 +17,7 @@ import { updateRouter } from './routes/update.route.js';
 dayjs.extend(customParseFormat);
 
 // Validate required environment variables
-const validateEnv = (): void => {
+const validateEnv = () => {
   const requiredEnvVars = ['API_APPKEY', 'DATABASE_URL'] as const;
   const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 
