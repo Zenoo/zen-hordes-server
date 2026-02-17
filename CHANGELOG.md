@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.26](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.25...v1.0.26) (2026-02-17)
+
+
+### Bug Fixes
+
+* Town update error when poisoned items are in the bank ([4a8913c](https://github.com/Zenoo/zen-hordes-server/commit/4a8913c245e6161ceda10739280a91da076905b6))
+
 ## [1.0.25](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.24...v1.0.25) (2026-02-17)
 
 
