@@ -78,11 +78,6 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   });
 
   if (data.city?.bank) {
-    // Delete old bank items
-    await prisma.bankItem.deleteMany({
-      where: { townId },
-    });
-
     const bankItems = data.city.bank.map((item) => ({
       townId,
       id: item.id ?? 0,
@@ -90,23 +85,30 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
       broken: item.broken ?? false,
     }));
 
-    // Create new bank items
-    await prisma.bankItem.createMany({
-      data: bankItems,
-    });
+    await prisma.$transaction([
+      // Delete old bank items
+      prisma.bankItem.deleteMany({
+        where: { townId },
+      }),
 
-    // Update town data
-    await prisma.town.update({
-      where: { id: townId },
-      data: {
-        lastUpdate: new Date(),
-        waterInWell: data.city.water,
-        chaos: data.city.chaos,
-        devastated: data.city.devast,
-        doorOpened: data.city.door,
-        insurrected: data.conspiracy,
-      },
-    });
+      // Create new bank items
+      prisma.bankItem.createMany({
+        data: bankItems,
+      }),
+
+      // Update town data
+      prisma.town.update({
+        where: { id: townId },
+        data: {
+          lastUpdate: new Date(),
+          waterInWell: data.city.water,
+          chaos: data.city.chaos,
+          devastated: data.city.devast,
+          doorOpened: data.city.door,
+          insurrected: data.conspiracy,
+        },
+      }),
+    ]);
   }
 
   // Update zones
