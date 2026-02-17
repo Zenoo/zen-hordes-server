@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.27](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.26...v1.0.27) (2026-02-17)
+
+
+### Bug Fixes
+
+* Wrong town ID for item storage ([1963809](https://github.com/Zenoo/zen-hordes-server/commit/1963809deab5434a8b78e173039d3406d50d62eb))
+
 ## [1.0.26](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.25...v1.0.26) (2026-02-17)
 
 
