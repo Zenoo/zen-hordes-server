@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.22](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.21...v1.0.22) (2026-02-17)
+
+
+### Bug Fixes
+
+* Update town bank in transaction to prevent race errors ([0c4157e](https://github.com/Zenoo/zen-hordes-server/commit/0c4157e9f4c109996ee316eca2eb4133f8c28585))
+
 ## [1.0.21](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.20...v1.0.21) (2026-02-16)
 
 
