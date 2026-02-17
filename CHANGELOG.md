@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.25](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.24...v1.0.25) (2026-02-17)
+
+
+### Bug Fixes
+
+* Send original url to discord error logs ([7c6ae5e](https://github.com/Zenoo/zen-hordes-server/commit/7c6ae5ebdf1aa9b48ff20994b6fa29607792519e))
+
 ## [1.0.24](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.23...v1.0.24) (2026-02-17)
 
 
