@@ -91,7 +91,7 @@ export class NetworkDiscordClient implements DiscordClient {
 
     const embed = new EmbedBuilder()
       .setColor(0xff0000)
-      .setTitle(formatEmbedTitle(res ? res.req.url : error.message))
+      .setTitle(formatEmbedTitle(res ? res.req.originalUrl : error.message))
       .setAuthor({
         name: 'ZenHordes',
         iconURL: 'https://zenoo.github.io/zen-hordes/icons/zen-icon.png',
