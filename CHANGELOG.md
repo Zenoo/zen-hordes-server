@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.23](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.22...v1.0.23) (2026-02-17)
+
+
+### Bug Fixes
+
+* Update citizen position after update ([694ec5e](https://github.com/Zenoo/zen-hordes-server/commit/694ec5ec74e7cdc1303f6fab1ed163a1c3cbf180))
+
 ## [1.0.22](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.21...v1.0.22) (2026-02-17)
 
 
