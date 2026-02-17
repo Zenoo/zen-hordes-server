@@ -1,13 +1,14 @@
 import dayjs from 'dayjs';
-import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums.js';
-import { ZoneCreateManyInput, ZoneItemCreateManyInput } from '../generated/prisma/models.js';
-import { Api, JSONGameObject } from './api/mh-api.js';
-import { prisma } from './prisma.js';
-import { updateCacheAfterHourlyUpdate } from './cache-update.js';
 import { LOGGER } from '../context.js';
-import { checkApiAvailability } from './api/mh-api.helper.js';
-import { ExpectedError } from './error.js';
 import { Town } from '../generated/prisma/client.js';
+import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums.js';
+import { ZoneCreateManyInput } from '../generated/prisma/models.js';
+import { checkApiAvailability } from './api/mh-api.helper.js';
+import { Api, JSONGameObject } from './api/mh-api.js';
+import { updateCacheAfterHourlyUpdate } from './cache-update.js';
+import { ExpectedError } from './error.js';
+import { getBankItems, getZoneItems } from './item.js';
+import { prisma } from './prisma.js';
 
 const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number]) => {
   const jobIcon = citizen.job?.uid;
@@ -79,37 +80,32 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   });
 
   if (data.city?.bank) {
-    const bankItems = data.city.bank.map((item) => ({
-      townId,
-      id: item.id ?? 0,
-      quantity: item.count ?? 1,
-      broken: item.broken ?? false,
-    }));
+    const bankItems = getBankItems(data);
 
-    await prisma.$transaction([
-      // Delete old bank items
-      prisma.bankItem.deleteMany({
-        where: { townId },
-      }),
+    // Delete old bank items
+    await prisma.bankItem.deleteMany({
+      where: { townId },
+    });
 
-      // Create new bank items
-      prisma.bankItem.createMany({
+    // Create new bank items
+    if (bankItems.length > 0) {
+      await prisma.bankItem.createMany({
         data: bankItems,
-      }),
+      });
+    }
 
-      // Update town data
-      prisma.town.update({
-        where: { id: townId },
-        data: {
-          lastUpdate: new Date(),
-          waterInWell: data.city.water,
-          chaos: data.city.chaos,
-          devastated: data.city.devast,
-          doorOpened: data.city.door,
-          insurrected: data.conspiracy,
-        },
-      }),
-    ]);
+    // Update town data
+    await prisma.town.update({
+      where: { id: townId },
+      data: {
+        lastUpdate: new Date(),
+        waterInWell: data.city.water,
+        chaos: data.city.chaos,
+        devastated: data.city.devast,
+        doorOpened: data.city.door,
+        insurrected: data.conspiracy,
+      },
+    });
   }
 
   // Update zones
@@ -396,7 +392,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
     select: { id: true, lastUpdate: true, x: true, y: true },
   });
 
-  LOGGER.log(`User ${userId} created town ${town.id} - ${townName} (started at ${start.toISOString()})`);
+  LOGGER.log(`User ${userId} created town ${town.id} - ${townName}`);
 
   // Create zones
   if (data.zones?.length) {
@@ -408,17 +404,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
     });
 
     // Create items
-    const items: ZoneItemCreateManyInput[] = data.zones.flatMap((z) => {
-      if (!z.items) return [];
-      return z.items.map((item) => ({
-        townId: town.id,
-        x: (z.x ?? 0) - (data.city?.x ?? 0),
-        y: -(z.y ?? 0) + (data.city?.y ?? 0),
-        id: item.id ?? 0,
-        quantity: item.count,
-        broken: item.broken,
-      }));
-    });
+    const items = getZoneItems(data);
 
     if (items.length > 0) {
       await prisma.zoneItem.createMany({
@@ -429,13 +415,10 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
 
   // Create bank items
   if (data.city?.bank?.length) {
+    const bankItems = getBankItems(data);
+
     await prisma.bankItem.createMany({
-      data: data.city.bank.map((item) => ({
-        townId: town.id,
-        id: item.id ?? 0,
-        quantity: item.count,
-        broken: item.broken,
-      })),
+      data: bankItems,
     });
   }
 

@@ -32,7 +32,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Trust proxy - required for rate limiting behind reverse proxies
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
@@ -62,9 +62,7 @@ app.use((req, res, next) => {
   res.setTimeout(30000);
   next();
 });
-app.get('/ip', (request, response) => {
-  response.send(request.ip);
-});
+
 // Routes
 app.get('/', (_req, res) => {
   res.json({ version: packageJson.version });
