@@ -43,6 +43,7 @@ const responseSchema = registry.register(
           citizens: z
             .array(
               z.object({
+                userId: z.number().openapi({ description: 'User ID' }),
                 x: z.number().openapi({ description: 'X coordinate of the citizen' }),
                 y: z.number().openapi({ description: 'Y coordinate of the citizen' }),
               })
@@ -117,6 +118,7 @@ router.post('/', async (req: Request, res: Response<MapsResponseType | ErrorResp
           },
           citizens: {
             select: {
+              userId: true,
               x: true,
               y: true,
             },

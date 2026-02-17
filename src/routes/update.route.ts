@@ -80,7 +80,7 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
 
     // Create user & town if needed
     const user = await createUser(api, data.userId, data.key);
-    await createOrUpdateTowns(api, [data.townId], data.userId);
+    const [town] = await createOrUpdateTowns(api, [data.townId], data.userId);
 
     // Check if the user is actually in the town
     await checkUserInTown(api, data.townId, data.userId);
@@ -146,8 +146,8 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
         },
       },
       data: {
-        x: data.x,
-        y: data.y,
+        x: data.x + town.x,
+        y: town.y - data.y,
       },
     });
 

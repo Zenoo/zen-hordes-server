@@ -44,8 +44,8 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
     // Update citizen's position
     const citizenIndex = townCached.town.citizens.findIndex((c) => c.userId === userId);
     if (citizenIndex !== -1) {
-      townCached.town.citizens[citizenIndex].x = x;
-      townCached.town.citizens[citizenIndex].y = y;
+      townCached.town.citizens[citizenIndex].x = x + townCached.town.x;
+      townCached.town.citizens[citizenIndex].y = townCached.town.y - y;
     }
 
     // Update depletion status of adjacent zones based on scavenger radar
@@ -91,6 +91,13 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
       mapCached.zones[zoneIndex] = updatedMapZone;
     } else {
       mapCached.zones.push(updatedMapZone);
+    }
+
+    // Update citizen's position in map cache
+    const citizenIndex = mapCached.citizens.findIndex((c) => c.userId === userId);
+    if (citizenIndex !== -1) {
+      mapCached.citizens[citizenIndex].x = x + mapCached.x;
+      mapCached.citizens[citizenIndex].y = mapCached.y - y;
     }
 
     setCached(mapCacheKey, mapCached);
@@ -207,10 +214,11 @@ export const updateCacheAfterHourlyUpdate = (townId: number, data: JSONGameObjec
   // Update citizens in map cache
   if (mapCached && data.citizens?.length) {
     for (const citizen of data.citizens) {
-      const citizenIndex = mapCached.citizens.findIndex((c) => c.x === citizen.x && c.y === citizen.y);
+      const citizenIndex = mapCached.citizens.findIndex((c) => c.userId === citizen.id);
 
       if (citizenIndex !== -1 && (citizen.x !== undefined || citizen.y !== undefined)) {
         mapCached.citizens[citizenIndex] = {
+          userId: mapCached.citizens[citizenIndex].userId,
           x: citizen.x ?? mapCached.citizens[citizenIndex].x,
           y: citizen.y ?? mapCached.citizens[citizenIndex].y,
         };

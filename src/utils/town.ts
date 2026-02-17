@@ -7,6 +7,7 @@ import { updateCacheAfterHourlyUpdate } from './cache-update.js';
 import { LOGGER } from '../context.js';
 import { checkApiAvailability } from './api/mh-api.helper.js';
 import { ExpectedError } from './error.js';
+import { Town } from '../generated/prisma/client.js';
 
 const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number]) => {
   const jobIcon = citizen.job?.uid;
@@ -256,35 +257,46 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   // Update cache
   updateCacheAfterHourlyUpdate(townId, data);
 
-  return prisma.town.findUnique({
+  const result = await prisma.town.findUnique({
     where: { id: townId },
-    select: { id: true, lastUpdate: true },
+    select: { id: true, lastUpdate: true, x: true, y: true },
   });
+
+  if (!result) {
+    throw new Error('Town not found');
+  }
+
+  return result;
 };
 
 export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[], userId: number) => {
   const towns = await prisma.town.findMany({
     where: { id: { in: ids } },
-    select: { id: true, lastUpdate: true },
+    select: { id: true, lastUpdate: true, x: true, y: true },
   });
+
+  const results: Pick<Town, 'id' | 'lastUpdate' | 'x' | 'y'>[] = [];
 
   for (const id of ids) {
     const town = towns.find((t) => t.id === id);
 
     if (town) {
       if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
-        await updateCity(api, town.id);
+        results.push(await updateCity(api, town.id));
+      } else {
+        results.push(town);
       }
-
       continue;
     }
 
-    await createTownFromApi(api, id, userId);
+    results.push(await createTownFromApi(api, id, userId));
   }
+
+  return results;
 };
 
 const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) => {
-  let town: { id: number; lastUpdate: Date | null } | null = null;
+  let town: Pick<Town, 'id' | 'lastUpdate' | 'x' | 'y'> | null = null;
 
   // Check API availability
   await checkApiAvailability(api);
@@ -381,7 +393,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
       doorOpened: data.city?.door,
       pandemonium: data.city?.hard,
     },
-    select: { id: true, lastUpdate: true },
+    select: { id: true, lastUpdate: true, x: true, y: true },
   });
 
   LOGGER.log(`User ${userId} created town ${town.id} - ${townName} (started at ${start.toISOString()})`);
