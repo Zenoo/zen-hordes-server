@@ -3,7 +3,7 @@ import { JSONGameObject } from './api/mh-api.js';
 import { getCached, setCached } from './cache.js';
 
 export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
-  const { townId, x, y, buildingId, depleted, zombies, items } = data;
+  const { townId, x, y, buildingId, depleted, zombies, items, userId } = data;
 
   let dangerLevel = 0;
   if (data.zombies > 5) {
@@ -21,6 +21,7 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
   if (townCached?.town) {
     const zoneIndex = townCached.town.zones.findIndex((z) => z.x === x && z.y === y);
 
+    // Update current zone
     const updatedZone = {
       x,
       y,
@@ -30,7 +31,7 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
       depleted,
       zombies,
       updatedAt: new Date().toISOString(),
-      updatedById: data.userId,
+      updatedById: userId,
       items,
     };
 
@@ -38,6 +39,13 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
       townCached.town.zones[zoneIndex] = updatedZone;
     } else {
       townCached.town.zones.push(updatedZone);
+    }
+
+    // Update citizen's position
+    const citizenIndex = townCached.town.citizens.findIndex((c) => c.userId === userId);
+    if (citizenIndex !== -1) {
+      townCached.town.citizens[citizenIndex].x = x;
+      townCached.town.citizens[citizenIndex].y = y;
     }
 
     // Update depletion status of adjacent zones based on scavenger radar
