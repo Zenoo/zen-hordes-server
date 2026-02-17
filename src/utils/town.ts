@@ -80,7 +80,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   });
 
   if (data.city?.bank) {
-    const bankItems = getBankItems(data);
+    const bankItems = getBankItems(townId, data);
 
     // Delete old bank items
     await prisma.bankItem.deleteMany({
@@ -404,7 +404,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
     });
 
     // Create items
-    const items = getZoneItems(data);
+    const items = getZoneItems(town.id, data);
 
     if (items.length > 0) {
       await prisma.zoneItem.createMany({
@@ -415,7 +415,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
 
   // Create bank items
   if (data.city?.bank?.length) {
-    const bankItems = getBankItems(data);
+    const bankItems = getBankItems(town.id, data);
 
     await prisma.bankItem.createMany({
       data: bankItems,

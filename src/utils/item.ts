@@ -1,7 +1,7 @@
 import { BankItemCreateManyInput, ZoneItemCreateManyInput } from '../generated/prisma/models.js';
 import { JSONGameObject } from './api/mh-api.js';
 
-export const getBankItems = (data: JSONGameObject): BankItemCreateManyInput[] => {
+export const getBankItems = (townId: number, data: JSONGameObject): BankItemCreateManyInput[] => {
   if (!data.city?.bank?.length) {
     return [];
   }
@@ -17,7 +17,7 @@ export const getBankItems = (data: JSONGameObject): BankItemCreateManyInput[] =>
       existing.quantity = (existing.quantity ?? 0) + (item.count ?? 1);
     } else {
       groupedItems.set(key, {
-        townId: data.id ?? 0,
+        townId,
         id: item.id ?? 0,
         quantity: item.count ?? 1,
         broken: item.broken ?? false,
@@ -28,7 +28,7 @@ export const getBankItems = (data: JSONGameObject): BankItemCreateManyInput[] =>
   return Array.from(groupedItems.values());
 };
 
-export const getZoneItems = (data: JSONGameObject): ZoneItemCreateManyInput[] => {
+export const getZoneItems = (townId: number, data: JSONGameObject): ZoneItemCreateManyInput[] => {
   if (!data.zones?.length) {
     return [];
   }
@@ -49,7 +49,7 @@ export const getZoneItems = (data: JSONGameObject): ZoneItemCreateManyInput[] =>
         existing.quantity = (existing.quantity ?? 0) + (item.count ?? 1);
       } else {
         groupedItems.set(key, {
-          townId: data.id ?? 0,
+          townId,
           x,
           y,
           id: item.id ?? 0,
