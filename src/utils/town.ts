@@ -187,16 +187,45 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
 
   const newDeadCitizens = existingCitizens.filter((ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId));
 
-  // Mark citizens as dead if they are no longer present
-  await prisma.citizen.updateMany({
-    where: {
-      townId,
-      userId: { in: newDeadCitizens.map((dc) => dc.userId) },
-    },
-    data: {
-      dead: true,
-    },
-  });
+  if (newDeadCitizens.length > 0) {
+    LOGGER.log(`Marking citizens as dead in town ${townId}: ${newDeadCitizens.map((c) => c.userId).join(', ')}`);
+    LOGGER.log(`API citizens: ${data.citizens?.map((c) => c.id).join(', ')}`);
+    LOGGER.log(`Existing citizens: ${existingCitizens.map((c) => ({ userId: c.userId, dead: c.dead })).join(', ')}`);
+
+    // Mark citizens as dead if they are no longer present
+    await prisma.citizen.updateMany({
+      where: {
+        townId,
+        userId: { in: newDeadCitizens.map((dc) => dc.userId) },
+      },
+      data: {
+        dead: true,
+      },
+    });
+  }
+
+  // Check if there are citizen marked as dead that are still present in the API, if so, mark them as alive again
+  const wronglyMarkedDeadCitizens = existingCitizens.filter(
+    (ec) => ec.dead && data.citizens?.some((c) => c.id === ec.userId)
+  );
+
+  if (wronglyMarkedDeadCitizens.length > 0) {
+    LOGGER.warn(
+      `Marking citizens as alive again in town ${townId} because they are still present in the API: ${wronglyMarkedDeadCitizens
+        .map((c) => c.userId)
+        .join(', ')}`
+    );
+
+    await prisma.citizen.updateMany({
+      where: {
+        townId,
+        userId: { in: wronglyMarkedDeadCitizens.map((dc) => dc.userId) },
+      },
+      data: {
+        dead: false,
+      },
+    });
+  }
 
   if (data.citizens?.length) {
     for (const citizen of data.citizens) {
@@ -277,11 +306,11 @@ export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[], user
     const town = towns.find((t) => t.id === id);
 
     if (town) {
-      if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
-        results.push(await updateCity(api, town.id));
-      } else {
-        results.push(town);
-      }
+      // if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
+      results.push(await updateCity(api, town.id));
+      // } else {
+      //   results.push(town);
+      // }
       continue;
     }
 

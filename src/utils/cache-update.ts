@@ -157,6 +157,47 @@ export const updateCacheAfterHourlyUpdate = (townId: number, data: JSONGameObjec
       }
     }
 
+    // Update citizens
+    if (data.citizens?.length) {
+      // Mark citizens as dead if they are no longer present
+      const existingCitizens = townCached.town.citizens;
+      const newDeadCitizens = existingCitizens.filter(
+        (ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId)
+      );
+
+      for (const deadCitizen of newDeadCitizens) {
+        const citizenIndex = townCached.town.citizens.findIndex((c) => c.userId === deadCitizen.userId);
+        if (citizenIndex !== -1) {
+          townCached.town.citizens[citizenIndex].dead = true;
+        }
+      }
+
+      // Check if there are citizen marked as dead that are still present in the API, if so, mark them as alive again
+      const wronglyMarkedAsDeadCitizens = townCached.town.citizens.filter(
+        (ec) => ec.dead && data.citizens?.some((c) => c.id === ec.userId)
+      );
+
+      for (const citizen of wronglyMarkedAsDeadCitizens) {
+        const citizenIndex = townCached.town.citizens.findIndex((c) => c.userId === citizen.userId);
+        if (citizenIndex !== -1) {
+          townCached.town.citizens[citizenIndex].dead = false;
+        }
+      }
+
+      for (const citizen of data.citizens) {
+        const citizenIndex = townCached.town.citizens.findIndex((c) => c.userId === citizen.id);
+
+        if (citizenIndex !== -1 && (citizen.x !== undefined || citizen.y !== undefined)) {
+          const existingCitizen = townCached.town.citizens[citizenIndex];
+          townCached.town.citizens[citizenIndex] = {
+            ...existingCitizen,
+            x: citizen.x ?? existingCitizen.x,
+            y: citizen.y ?? existingCitizen.y,
+          };
+        }
+      }
+    }
+
     setCached(townCacheKey, townCached);
   }
 
@@ -164,64 +205,46 @@ export const updateCacheAfterHourlyUpdate = (townId: number, data: JSONGameObjec
   const mapCacheKey = `town-map:${townId}` as const;
   const mapCached = getCached(mapCacheKey);
 
-  if (mapCached && data.zones?.length) {
-    for (const _z of data.zones) {
-      const z = _z as typeof _z & {
-        nvt?: 1 | 0;
-        danger?: number;
-        building?: { type: number };
-      };
+  if (mapCached) {
+    if (data.zones?.length) {
+      for (const _z of data.zones) {
+        const z = _z as typeof _z & {
+          nvt?: 1 | 0;
+          danger?: number;
+          building?: { type: number };
+        };
 
-      const zoneIndex = mapCached.zones.findIndex((zone) => zone.x === z.x && zone.y === z.y);
-      const existingMapZone = zoneIndex !== -1 ? mapCached.zones[zoneIndex] : null;
+        const zoneIndex = mapCached.zones.findIndex((zone) => zone.x === z.x && zone.y === z.y);
+        const existingMapZone = zoneIndex !== -1 ? mapCached.zones[zoneIndex] : null;
 
-      const updatedMapZone = {
-        x: z.x ?? existingMapZone?.x ?? 0,
-        y: z.y ?? existingMapZone?.y ?? 0,
-        visitedToday: typeof z.nvt === 'number' ? z.nvt === 0 : (existingMapZone?.visitedToday ?? false),
-        dangerLevel: typeof z.danger === 'number' ? z.danger : (existingMapZone?.dangerLevel ?? 0),
-        buildingId: z.building?.type ?? existingMapZone?.buildingId ?? null,
-      };
+        const updatedMapZone = {
+          x: z.x ?? existingMapZone?.x ?? 0,
+          y: z.y ?? existingMapZone?.y ?? 0,
+          visitedToday: typeof z.nvt === 'number' ? z.nvt === 0 : (existingMapZone?.visitedToday ?? false),
+          dangerLevel: typeof z.danger === 'number' ? z.danger : (existingMapZone?.dangerLevel ?? 0),
+          buildingId: z.building?.type ?? existingMapZone?.buildingId ?? null,
+        };
 
-      if (zoneIndex !== -1) {
-        mapCached.zones[zoneIndex] = updatedMapZone;
-      } else {
-        mapCached.zones.push(updatedMapZone);
+        if (zoneIndex !== -1) {
+          mapCached.zones[zoneIndex] = updatedMapZone;
+        } else {
+          mapCached.zones.push(updatedMapZone);
+        }
       }
     }
 
-    setCached(mapCacheKey, mapCached);
-  }
+    // Update citizens in map cache
+    if (data.citizens?.length) {
+      for (const citizen of data.citizens) {
+        const citizenIndex = mapCached.citizens.findIndex((c) => c.userId === citizen.id);
 
-  // Update citizens
-  if (townCached?.town && data.citizens?.length) {
-    for (const citizen of data.citizens) {
-      const citizenIndex = townCached.town.citizens.findIndex((c) => c.userId === citizen.id);
-
-      if (citizenIndex !== -1 && (citizen.x !== undefined || citizen.y !== undefined)) {
-        const existingCitizen = townCached.town.citizens[citizenIndex];
-        townCached.town.citizens[citizenIndex] = {
-          ...existingCitizen,
-          x: citizen.x ?? existingCitizen.x,
-          y: citizen.y ?? existingCitizen.y,
-        };
-      }
-    }
-
-    setCached(townCacheKey, townCached);
-  }
-
-  // Update citizens in map cache
-  if (mapCached && data.citizens?.length) {
-    for (const citizen of data.citizens) {
-      const citizenIndex = mapCached.citizens.findIndex((c) => c.userId === citizen.id);
-
-      if (citizenIndex !== -1 && (citizen.x !== undefined || citizen.y !== undefined)) {
-        mapCached.citizens[citizenIndex] = {
-          userId: mapCached.citizens[citizenIndex].userId,
-          x: citizen.x ?? mapCached.citizens[citizenIndex].x,
-          y: citizen.y ?? mapCached.citizens[citizenIndex].y,
-        };
+        if (citizenIndex !== -1 && (citizen.x !== undefined || citizen.y !== undefined)) {
+          mapCached.citizens[citizenIndex] = {
+            userId: mapCached.citizens[citizenIndex].userId,
+            x: citizen.x ?? mapCached.citizens[citizenIndex].x,
+            y: citizen.y ?? mapCached.citizens[citizenIndex].y,
+          };
+        }
       }
     }
 
