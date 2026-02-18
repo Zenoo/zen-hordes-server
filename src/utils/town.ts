@@ -82,17 +82,19 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   if (data.city?.bank) {
     const bankItems = getBankItems(townId, data);
 
-    // Delete old bank items
-    await prisma.bankItem.deleteMany({
-      where: { townId },
-    });
-
-    // Create new bank items
-    if (bankItems.length > 0) {
-      await prisma.bankItem.createMany({
-        data: bankItems,
+    await prisma.$transaction(async (tx) => {
+      // Delete old bank items
+      await tx.bankItem.deleteMany({
+        where: { townId },
       });
-    }
+
+      // Create new bank items
+      if (bankItems.length > 0) {
+        await tx.bankItem.createMany({
+          data: bankItems,
+        });
+      }
+    });
 
     // Update town data
     await prisma.town.update({
@@ -306,11 +308,11 @@ export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[], user
     const town = towns.find((t) => t.id === id);
 
     if (town) {
-      // if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
-      results.push(await updateCity(api, town.id));
-      // } else {
-      //   results.push(town);
-      // }
+      if (dayjs().diff(dayjs(town.lastUpdate), 'hour') >= 1) {
+        results.push(await updateCity(api, town.id));
+      } else {
+        results.push(town);
+      }
       continue;
     }
 
