@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.28](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.27...v1.0.28) (2026-02-18)
+
+
+### Bug Fixes
+
+* Debug dead citizen marking ([4cb2a5d](https://github.com/Zenoo/zen-hordes-server/commit/4cb2a5d4ee35708b3cf6b6bfa44e2ef03b1afe5d))
+
 ## [1.0.27](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.26...v1.0.27) (2026-02-17)
 
 
