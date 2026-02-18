@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.29](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.28...v1.0.29) (2026-02-18)
+
+
+### Bug Fixes
+
+* Use single transaction to update town bank ([6a838b9](https://github.com/Zenoo/zen-hordes-server/commit/6a838b99796e8ac419d1c7191ebf8aa27d6e4c30))
+
 ## [1.0.28](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.27...v1.0.28) (2026-02-18)
 
 
