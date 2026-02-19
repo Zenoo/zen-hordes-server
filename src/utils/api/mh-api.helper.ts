@@ -20,9 +20,10 @@ export const createMHApi = (userkey: string): Api<unknown> => {
 
 export const checkApiAvailability = async (api: Api<unknown>) => {
   // Fetch API status
-  const status = await api.json.statusList();
+  const _status = await api.json.statusList();
+  const status = _status as typeof _status & { data: { error: boolean } };
 
-  const available = !status.data.attack && !status.data.maintain && !status.error;
+  const available = !status.data.attack && !status.data.maintain && !status.data.error;
 
   LOGGER.log(`MyHordes API status: ${available ? 'available' : 'unavailable'}`);
   LOGGER.log(JSON.stringify(status.data));
