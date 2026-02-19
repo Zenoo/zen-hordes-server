@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.30](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.29...v1.0.30) (2026-02-19)
+
+
+### Bug Fixes
+
+* Debug maintenance mode detection ([a2d1af0](https://github.com/Zenoo/zen-hordes-server/commit/a2d1af0a4c6a89de99da4e7b316b5ca9ab2e3a3e))
+
 ## [1.0.29](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.28...v1.0.29) (2026-02-18)
 
 
