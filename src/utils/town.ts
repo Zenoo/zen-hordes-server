@@ -190,9 +190,9 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   const newDeadCitizens = existingCitizens.filter((ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId));
 
   if (newDeadCitizens.length > 0) {
-    LOGGER.log(`Marking citizens as dead in town ${townId}: ${newDeadCitizens.map((c) => c.userId).join(', ')}`);
-    LOGGER.log(`API citizens: ${data.citizens?.map((c) => c.id).join(', ')}`);
-    LOGGER.log(`Existing citizens: ${existingCitizens.map((c) => ({ userId: c.userId, dead: c.dead })).join(', ')}`);
+    if (data.citizens?.length === 0) {
+      LOGGER.warn(`Marking all citizens as dead in town ${townId} because there are no citizens in the API`);
+    }
 
     // Mark citizens as dead if they are no longer present
     await prisma.citizen.updateMany({
