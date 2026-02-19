@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.31](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.30...v1.0.31) (2026-02-19)
+
+
+### Bug Fixes
+
+* Handle error status from MH api ([7a7f2f9](https://github.com/Zenoo/zen-hordes-server/commit/7a7f2f92354ef339e7c69e0b3eec13a40e7b2ee4))
+
 ## [1.0.30](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.29...v1.0.30) (2026-02-19)
 
 
