@@ -22,7 +22,7 @@ export const checkApiAvailability = async (api: Api<unknown>) => {
   // Fetch API status
   const status = await api.json.statusList();
 
-  const available = !status.data.attack && !status.data.maintain;
+  const available = !status.data.attack && !status.data.maintain && !status.error;
 
   LOGGER.log(`MyHordes API status: ${available ? 'available' : 'unavailable'}`);
   LOGGER.log(JSON.stringify(status.data));
