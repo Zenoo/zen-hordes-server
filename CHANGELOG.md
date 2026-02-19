@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.32](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.31...v1.0.32) (2026-02-19)
+
+
+### Bug Fixes
+
+* Check status error ([16ef4d2](https://github.com/Zenoo/zen-hordes-server/commit/16ef4d201a1b530c2374894f2814eedcf032b0ca))
+
 ## [1.0.31](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.30...v1.0.31) (2026-02-19)
 
 
