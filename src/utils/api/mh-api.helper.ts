@@ -1,4 +1,3 @@
-import { LOGGER } from '../../context.js';
 import { ExpectedError } from '../error.js';
 import { Api } from './mh-api.js';
 
@@ -24,9 +23,6 @@ export const checkApiAvailability = async (api: Api<unknown>) => {
   const status = _status as typeof _status & { data: { error: boolean } };
 
   const available = !status.data.attack && !status.data.maintain && !status.data.error;
-
-  LOGGER.log(`MyHordes API status: ${available ? 'available' : 'unavailable'}`);
-  LOGGER.log(JSON.stringify(status.data));
 
   if (!available) {
     throw new ExpectedError('MyHordes API is currently unavailable', 503);
