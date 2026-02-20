@@ -95,10 +95,10 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
         .map((item) => `(${item.townId}, ${item.id}, ${item.broken ? 'TRUE' : 'FALSE'}, ${item.quantity})`)
         .join(', ');
 
-      await prisma.$executeRaw`
-        INSERT INTO "BankItem" ("townId", "id", "broken", "quantity") VALUES ${values}
-        ON CONFLICT ("townId", "id", "broken") DO UPDATE SET "quantity" = EXCLUDED."quantity"
-      `;
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO "BankItem" ("townId", "id", "broken", "quantity") VALUES ${values}
+        ON CONFLICT ("townId", "id", "broken") DO UPDATE SET "quantity" = EXCLUDED."quantity"`
+      );
     }
 
     // Update town data
