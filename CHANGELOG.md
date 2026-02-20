@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.36](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.35...v1.0.36) (2026-02-20)
+
+
+### Bug Fixes
+
+* Update raw queries for upserting bank items and zones in updateCity function ([b5c40b7](https://github.com/Zenoo/zen-hordes-server/commit/b5c40b7e68d3bd07bae34f333a4e90f268ce276e))
+
 ## [1.0.35](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.34...v1.0.35) (2026-02-20)
 
 
