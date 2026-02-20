@@ -83,19 +83,23 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   if (data.city?.bank) {
     const bankItems = getBankItems(townId, data);
 
-    await prisma.$transaction(async (tx) => {
-      // Delete old bank items
-      await tx.bankItem.deleteMany({
-        where: { townId },
-      });
-
-      // Create new bank items
-      if (bankItems.length > 0) {
-        await tx.bankItem.createMany({
-          data: bankItems,
-        });
-      }
+    await prisma.bankItem.deleteMany({
+      where: {
+        townId,
+      },
     });
+
+    if (bankItems.length > 0) {
+      // Upsert bank items using raw query
+      const values = bankItems
+        .map((item) => `(${item.townId}, ${item.id}, ${item.broken ? 'TRUE' : 'FALSE'}, ${item.quantity})`)
+        .join(', ');
+
+      await prisma.$executeRaw`
+        INSERT INTO "BankItem" ("townId", "id", "broken", "quantity") VALUES ${values}
+        ON CONFLICT ("townId", "id", "broken") DO UPDATE SET "quantity" = EXCLUDED."quantity"
+      `;
+    }
 
     // Update town data
     await prisma.town.update({
