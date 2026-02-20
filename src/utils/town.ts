@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { LOGGER } from '../context.js';
-import { Town, Zone } from '../generated/prisma/client.js';
+import { Prisma, Town, Zone } from '../generated/prisma/client.js';
 import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums.js';
 import { ZoneCreateManyInput } from '../generated/prisma/models.js';
 import { checkApiAvailability } from './api/mh-api.helper.js';
@@ -90,15 +90,13 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
     });
 
     if (bankItems.length > 0) {
-      // Upsert bank items using raw query
-      const values = bankItems
-        .map((item) => `(${item.townId}, ${item.id}, ${item.broken ? 'TRUE' : 'FALSE'}, ${item.quantity})`)
-        .join(', ');
+      const values = bankItems.map((item) => [item.townId, item.id, item.broken, item.quantity]);
 
-      await prisma.$executeRawUnsafe(
-        `INSERT INTO "BankItem" ("townId", "id", "broken", "quantity") VALUES ${values}
-        ON CONFLICT ("townId", "id", "broken") DO UPDATE SET "quantity" = EXCLUDED."quantity"`
-      );
+      await prisma.$executeRaw`
+        INSERT INTO "BankItem" ("townId", "id", "broken", "quantity")
+        VALUES ${Prisma.join(values.map((row) => Prisma.sql`(${Prisma.join(row)})`))}
+        ON CONFLICT ("townId", "id", "broken") DO UPDATE SET "quantity" = EXCLUDED."quantity";
+      `;
     }
 
     // Update town data
@@ -130,12 +128,36 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
 
     // Create missing zones
     if (missingZones.length > 0) {
-      await prisma.zone.createMany({
-        data: missingZones.map((z) => {
-          const zoneData = mapZoneData(townId, data.city, z);
-          return { ...zoneData, townId };
-        }),
+      // await prisma.zone.createMany({
+      //   data: missingZones.map((z) => {
+      //     const zoneData = mapZoneData(townId, data.city, z);
+      //     return { ...zoneData, townId };
+      //   }),
+      // });
+      const values = missingZones.map((z) => {
+        const zoneData = mapZoneData(townId, data.city, z);
+        return [
+          zoneData.townId,
+          zoneData.x,
+          zoneData.y,
+          zoneData.visitedToday,
+          zoneData.dangerLevel,
+          zoneData.depleted,
+          zoneData.zombies,
+          zoneData.buildingId,
+        ];
       });
+
+      await prisma.$executeRaw`
+        INSERT INTO "Zone" ("townId", "x", "y", "visitedToday", "dangerLevel", "depleted", "zombies", "buildingId")
+        VALUES ${Prisma.join(values.map((row) => Prisma.sql`(${Prisma.join(row)})`))}
+        ON CONFLICT ("townId", "x", "y") DO UPDATE SET
+          "visitedToday" = EXCLUDED."visitedToday",
+          "dangerLevel" = EXCLUDED."dangerLevel",
+          "depleted" = EXCLUDED."depleted",
+          "zombies" = EXCLUDED."zombies",
+          "buildingId" = EXCLUDED."buildingId";
+      `;
     }
 
     // Update existing zones if needed
