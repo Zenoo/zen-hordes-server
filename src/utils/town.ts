@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { LOGGER } from '../context.js';
-import { Town } from '../generated/prisma/client.js';
+import { Town, Zone } from '../generated/prisma/client.js';
 import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums.js';
 import { ZoneCreateManyInput } from '../generated/prisma/models.js';
 import { checkApiAvailability } from './api/mh-api.helper.js';
@@ -34,7 +34,8 @@ const getCitizenJob = (citizen: NonNullable<JSONGameObject['citizens']>[number])
 const mapZoneData = (
   townId: number,
   city: Pick<NonNullable<JSONGameObject['city']>, 'x' | 'y'> | undefined,
-  _zone: NonNullable<JSONGameObject['zones']>[number]
+  _zone: NonNullable<JSONGameObject['zones']>[number],
+  existingZone?: Zone
 ): ZoneCreateManyInput => {
   const zone = _zone as typeof _zone & {
     // The Swagger is not up to date, those fields exist
@@ -49,11 +50,11 @@ const mapZoneData = (
     townId,
     x: (zone.x ?? 0) - (city?.x ?? 0),
     y: -(zone.y ?? 0) + (city?.y ?? 0),
-    visitedToday: typeof zone.nvt === 'number' ? zone.nvt === 0 : false,
-    dangerLevel: typeof zone.danger === 'number' ? zone.danger : 0,
-    depleted: 'dried' in zone.details ? zone.details.dried : false,
-    zombies: 'z' in zone.details ? zone.details.z : 0,
-    buildingId: zone.building?.type,
+    visitedToday: typeof zone.nvt === 'number' ? zone.nvt === 0 : (existingZone?.visitedToday ?? false),
+    dangerLevel: typeof zone.danger === 'number' ? zone.danger : (existingZone?.dangerLevel ?? 0),
+    depleted: 'dried' in zone.details ? zone.details.dried : (existingZone?.depleted ?? false),
+    zombies: 'z' in zone.details ? zone.details.z : (existingZone?.zombies ?? 0),
+    buildingId: zone.building?.type ?? existingZone?.buildingId,
   };
 };
 
@@ -167,7 +168,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
       }
 
       if (needUpdate) {
-        const zoneData = mapZoneData(townId, data.city, z);
+        const zoneData = mapZoneData(townId, data.city, z, existingZone);
         await prisma.zone.update({
           where: {
             townId_x_y: {
