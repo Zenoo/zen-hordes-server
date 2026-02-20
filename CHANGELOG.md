@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.33](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.32...v1.0.33) (2026-02-20)
+
+
+### Bug Fixes
+
+* Disable useless logs ([8696371](https://github.com/Zenoo/zen-hordes-server/commit/86963717728eaa83a5add604413bb6e8c171116e))
+* Reuse existing zone data for updates ([fe5aa39](https://github.com/Zenoo/zen-hordes-server/commit/fe5aa39d45b3f972c85530b3048568fe448a509b))
+
 ## [1.0.32](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.31...v1.0.32) (2026-02-19)
 
 
