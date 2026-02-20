@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.35](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.34...v1.0.35) (2026-02-20)
+
+
+### Bug Fixes
+
+* Use unsafe raw query for upserting bank items ([b0dac8a](https://github.com/Zenoo/zen-hordes-server/commit/b0dac8a1c32f162f932e667edae06c2638a917d7))
+
 ## [1.0.34](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.33...v1.0.34) (2026-02-20)
 
 
