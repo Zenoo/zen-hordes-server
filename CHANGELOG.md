@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.37](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.36...v1.0.37) (2026-02-23)
+
+
+### Bug Fixes
+
+* Ensure API availability check handles undefined status data ([d9855a4](https://github.com/Zenoo/zen-hordes-server/commit/d9855a411616fb93a382abcc1882934dfe279b3d))
+
 ## [1.0.36](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.35...v1.0.36) (2026-02-20)
 
 
