@@ -22,7 +22,7 @@ export const checkApiAvailability = async (api: Api<unknown>) => {
   const _status = await api.json.statusList();
   const status = _status as typeof _status & { data: { error: boolean } };
 
-  const available = !status.data.attack && !status.data.maintain && !status.data.error;
+  const available = status.data && !status.data.attack && !status.data.maintain && !status.data.error;
 
   if (!available) {
     throw new ExpectedError('MyHordes API is currently unavailable', 503);
