@@ -61,10 +61,10 @@ const responseSchema = registry.register(
               x: z.number().openapi({ description: 'X coordinate of the zone' }),
               y: z.number().openapi({ description: 'Y coordinate of the zone' }),
               visitedToday: z.boolean().openapi({ description: 'Whether the zone was visited today' }),
-              dangerLevel: z.number().openapi({ description: 'Danger level of the zone' }),
+              dangerLevel: z.number().nullable().openapi({ description: 'Danger level of the zone' }),
               buildingId: z.number().nullable().openapi({ description: 'ID of the building in the zone, if any' }),
               depleted: z.boolean().openapi({ description: 'Whether the zone is depleted' }),
-              zombies: z.number().openapi({ description: 'Number of zombies in the zone' }),
+              zombies: z.number().nullable().openapi({ description: 'Number of zombies in the zone' }),
               updatedAt: z.string().nullable().openapi({ description: 'Last update timestamp' }),
               updatedById: z.number().nullable().openapi({ description: 'ID of the user who last updated the zone' }),
               items: z

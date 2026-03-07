@@ -51,9 +51,9 @@ const mapZoneData = (
     x: (zone.x ?? 0) - (city?.x ?? 0),
     y: -(zone.y ?? 0) + (city?.y ?? 0),
     visitedToday: typeof zone.nvt === 'number' ? zone.nvt === 0 : (existingZone?.visitedToday ?? false),
-    dangerLevel: typeof zone.danger === 'number' ? zone.danger : (existingZone?.dangerLevel ?? 0),
+    dangerLevel: typeof zone.danger === 'number' ? zone.danger : existingZone?.dangerLevel,
     depleted: 'dried' in zone.details ? zone.details.dried : (existingZone?.depleted ?? false),
-    zombies: 'z' in zone.details ? zone.details.z : (existingZone?.zombies ?? 0),
+    zombies: 'z' in zone.details ? zone.details.z : existingZone?.zombies,
     buildingId: zone.building?.type ?? existingZone?.buildingId,
   };
 };
@@ -126,14 +126,10 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
         )
     );
 
+    const now = new Date();
+
     // Create missing zones
     if (missingZones.length > 0) {
-      // await prisma.zone.createMany({
-      //   data: missingZones.map((z) => {
-      //     const zoneData = mapZoneData(townId, data.city, z);
-      //     return { ...zoneData, townId };
-      //   }),
-      // });
       const values = missingZones.map((z) => {
         const zoneData = mapZoneData(townId, data.city, z);
         return [
@@ -145,18 +141,20 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
           zoneData.depleted,
           zoneData.zombies,
           zoneData.buildingId,
+          now,
         ];
       });
 
       await prisma.$executeRaw`
-        INSERT INTO "Zone" ("townId", "x", "y", "visitedToday", "dangerLevel", "depleted", "zombies", "buildingId")
+        INSERT INTO "Zone" ("townId", "x", "y", "visitedToday", "dangerLevel", "depleted", "zombies", "buildingId", "updatedAt")
         VALUES ${Prisma.join(values.map((row) => Prisma.sql`(${Prisma.join(row)})`))}
         ON CONFLICT ("townId", "x", "y") DO UPDATE SET
           "visitedToday" = EXCLUDED."visitedToday",
           "dangerLevel" = EXCLUDED."dangerLevel",
           "depleted" = EXCLUDED."depleted",
           "zombies" = EXCLUDED."zombies",
-          "buildingId" = EXCLUDED."buildingId";
+          "buildingId" = EXCLUDED."buildingId",
+          "updatedAt" = EXCLUDED."updatedAt"
       `;
     }
 
@@ -203,7 +201,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
               y: existingZone.y,
             },
           },
-          data: zoneData,
+          data: { ...zoneData, updatedAt: now },
         });
       }
     }

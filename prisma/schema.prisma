@@ -89,12 +89,12 @@ model Zone {
   y      Int
 
   visitedToday Boolean @default(false)
-  dangerLevel  Int     @default(0)
+  dangerLevel  Int?
   buildingId   Int?
 
   // Data only updated when a user visits the zone
   depleted    Boolean    @default(false)
-  zombies     Int        @default(0)
+  zombies     Int?
   items       ZoneItem[]
   updatedAt   DateTime?
   updatedBy   User?      @relation(fields: [updatedById], references: [id], onDelete: SetNull)

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Zone" ALTER COLUMN "zombies" DROP NOT NULL,
+ALTER COLUMN "zombies" DROP DEFAULT;

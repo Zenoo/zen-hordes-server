@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Zone" ALTER COLUMN "dangerLevel" DROP NOT NULL,
+ALTER COLUMN "dangerLevel" DROP DEFAULT;
