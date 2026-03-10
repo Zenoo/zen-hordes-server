@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.39](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.38...v1.0.39) (2026-03-10)
+
+
+### Bug Fixes
+
+* update cache timestamps based on zombie presence and danger level ([8ffdef8](https://github.com/Zenoo/zen-hordes-server/commit/8ffdef8cec90832fafc5b06dda5a2507f14340bc))
+
 ## [1.0.38](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.37...v1.0.38) (2026-03-07)
 
 
