@@ -132,6 +132,10 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
     if (missingZones.length > 0) {
       const values = missingZones.map((z) => {
         const zoneData = mapZoneData(townId, data.city, z);
+
+        // Only set updated date if zombies or danger level are present
+        const date = zoneData.zombies !== undefined && zoneData.dangerLevel !== undefined ? now : null;
+
         return [
           zoneData.townId,
           zoneData.x,
@@ -141,7 +145,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
           zoneData.depleted,
           zoneData.zombies,
           zoneData.buildingId,
-          now,
+          date,
         ];
       });
 
@@ -154,7 +158,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
           "depleted" = EXCLUDED."depleted",
           "zombies" = EXCLUDED."zombies",
           "buildingId" = EXCLUDED."buildingId",
-          "updatedAt" = EXCLUDED."updatedAt"
+          "updatedAt" = CASE WHEN EXCLUDED."updatedAt" IS NOT NULL THEN EXCLUDED."updatedAt" ELSE "Zone"."updatedAt" END;
       `;
     }
 
@@ -193,6 +197,9 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
 
       if (needUpdate) {
         const zoneData = mapZoneData(townId, data.city, z, existingZone);
+        const date =
+          z.danger !== undefined && 'z' in z.details && z.details.z !== undefined ? now : existingZone.updatedAt;
+
         await prisma.zone.update({
           where: {
             townId_x_y: {
@@ -201,7 +208,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
               y: existingZone.y,
             },
           },
-          data: { ...zoneData, updatedAt: now },
+          data: { ...zoneData, updatedAt: date },
         });
       }
     }

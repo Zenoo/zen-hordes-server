@@ -148,7 +148,10 @@ export const updateCacheAfterHourlyUpdate = (townId: number, data: JSONGameObjec
           buildingId: z.building?.type ?? existingZone.buildingId ?? null,
           depleted: 'dried' in z.details ? (z.details.dried ?? false) : existingZone.depleted,
           zombies: 'z' in z.details ? (z.details.z ?? 0) : existingZone.zombies,
-          updatedAt: new Date().toISOString(),
+          updatedAt:
+            z.danger !== undefined && 'z' in z.details && z.details.z !== undefined
+              ? new Date().toISOString()
+              : existingZone.updatedAt,
           updatedById: existingZone.updatedById,
           items: existingZone.items,
         };
