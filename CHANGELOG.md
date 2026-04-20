@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.40](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.39...v1.0.40) (2026-04-20)
+
+
+### Bug Fixes
+
+* correct dead citizen filtering logic ([c14deae](https://github.com/Zenoo/zen-hordes-server/commit/c14deae359790972069f00ed3bc260eece723b34))
+
 ## [1.0.39](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.38...v1.0.39) (2026-03-10)
 
 
