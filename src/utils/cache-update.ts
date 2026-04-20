@@ -165,7 +165,7 @@ export const updateCacheAfterHourlyUpdate = (townId: number, data: JSONGameObjec
       // Mark citizens as dead if they are no longer present
       const existingCitizens = townCached.town.citizens;
       const newDeadCitizens = existingCitizens.filter(
-        (ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId)
+        (ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId && !c.dead)
       );
 
       for (const deadCitizen of newDeadCitizens) {
@@ -177,7 +177,7 @@ export const updateCacheAfterHourlyUpdate = (townId: number, data: JSONGameObjec
 
       // Check if there are citizen marked as dead that are still present in the API, if so, mark them as alive again
       const wronglyMarkedAsDeadCitizens = townCached.town.citizens.filter(
-        (ec) => ec.dead && data.citizens?.some((c) => c.id === ec.userId)
+        (ec) => ec.dead && data.citizens?.some((c) => c.id === ec.userId && !c.dead)
       );
 
       for (const citizen of wronglyMarkedAsDeadCitizens) {

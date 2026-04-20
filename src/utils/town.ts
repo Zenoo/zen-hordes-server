@@ -219,7 +219,9 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
     where: { townId },
   });
 
-  const newDeadCitizens = existingCitizens.filter((ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId));
+  const newDeadCitizens = existingCitizens.filter(
+    (ec) => !ec.dead && !data.citizens?.some((c) => c.id === ec.userId && !c.dead)
+  );
 
   if (newDeadCitizens.length > 0) {
     if (data.citizens?.length === 0) {
@@ -240,7 +242,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
 
   // Check if there are citizen marked as dead that are still present in the API, if so, mark them as alive again
   const wronglyMarkedDeadCitizens = existingCitizens.filter(
-    (ec) => ec.dead && data.citizens?.some((c) => c.id === ec.userId)
+    (ec) => ec.dead && data.citizens?.some((c) => c.id === ec.userId && !c.dead)
   );
 
   if (wronglyMarkedDeadCitizens.length > 0) {
