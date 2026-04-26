@@ -226,6 +226,13 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   if (newDeadCitizens.length > 0) {
     if (data.citizens?.length === 0) {
       LOGGER.warn(`Marking all citizens as dead in town ${townId} because there are no citizens in the API`);
+    } else if (newDeadCitizens.length > 20) {
+      LOGGER.warn(
+        `Marking ${newDeadCitizens.length} citizens as dead in town ${townId}. Dead citizen IDs: ${newDeadCitizens
+          .map((c) => c.userId)
+          .join(', ')}.`
+      );
+      LOGGER.info(data);
     }
 
     // Mark citizens as dead if they are no longer present
