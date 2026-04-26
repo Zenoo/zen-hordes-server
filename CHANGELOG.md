@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.41](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.40...v1.0.41) (2026-04-26)
+
+
+### Bug Fixes
+
+* Enhance logging for dead citizens in updateCity function ([ab8dd5e](https://github.com/Zenoo/zen-hordes-server/commit/ab8dd5ec195631928e824eb0b10031752ad53b39))
+
 ## [1.0.40](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.39...v1.0.40) (2026-04-20)
 
 
