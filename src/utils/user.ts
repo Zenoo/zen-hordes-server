@@ -20,6 +20,10 @@ export const createUser = async (api: Api<unknown>, id: number, key: string) => 
     fields: 'id,twinId,etwinId,name,locale,avatar',
   });
 
+  if ('error' in data) {
+    throw new Error(`Error fetching user data from MyHordes API: ${data.error}`);
+  }
+
   if (!data.id) {
     throw new Error('User not found in MyHordes API');
   }

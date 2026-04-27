@@ -80,6 +80,10 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
     `.replace(/\s+/g, ''),
   });
 
+  if ('error' in data) {
+    throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
+  }
+
   if (data.city?.bank) {
     const bankItems = getBankItems(townId, data);
 
@@ -422,6 +426,10 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
 
   if (!data.id) {
     throw new Error('Town not found in MyHordes API');
+  }
+
+  if ('error' in data) {
+    throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
   }
 
   // Parse API data
