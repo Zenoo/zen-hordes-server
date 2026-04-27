@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.42](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.41...v1.0.42) (2026-04-27)
+
+
+### Bug Fixes
+
+* Check for API error before handling the request ([5fe4a28](https://github.com/Zenoo/zen-hordes-server/commit/5fe4a285bd50d936f899c6af5f1383f917870732))
+
 ## [1.0.41](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.40...v1.0.41) (2026-04-26)
 
 
