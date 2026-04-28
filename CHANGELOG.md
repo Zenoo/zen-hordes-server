@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.43](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.42...v1.0.43) (2026-04-28)
+
+
+### Bug Fixes
+
+* Handle 'invalid_userkey' error in updateCity and createUser functions ([654f2f7](https://github.com/Zenoo/zen-hordes-server/commit/654f2f7cf0eafbba27fc4d5b4d0c2737c18699d8))
+
 ## [1.0.42](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.41...v1.0.42) (2026-04-27)
 
 
