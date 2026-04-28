@@ -81,6 +81,9 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
   });
 
   if ('error' in data) {
+    if (data.error === 'invalid_userkey') {
+      throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
+    }
     throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
   }
 
@@ -429,6 +432,9 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
   }
 
   if ('error' in data) {
+    if (data.error === 'invalid_userkey') {
+      throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
+    }
     throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
   }
 
