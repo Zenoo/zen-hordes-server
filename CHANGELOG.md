@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.44](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.43...v1.0.44) (2026-05-15)
+
+
+### Bug Fixes
+
+* Stop throwing for dead towns ([4576d04](https://github.com/Zenoo/zen-hordes-server/commit/4576d044db548662de515e5edd24eb4552236386))
+
 ## [1.0.43](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.42...v1.0.43) (2026-04-28)
 
 
