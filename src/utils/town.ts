@@ -84,6 +84,10 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
     if (data.error === 'invalid_userkey') {
       throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
     }
+    if (data.error === 'UnknownMap') {
+      // Everyone died
+      throw new ExpectedError('This town died already', 410);
+    }
     throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
   }
 
