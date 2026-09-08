@@ -431,15 +431,15 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
       )`.replace(/\s+/g, ''),
   });
 
-  if (!data.id) {
-    throw new Error('Town not found in MyHordes API');
-  }
-
   if ('error' in data) {
     if (data.error === 'invalid_userkey') {
       throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
     }
     throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
+  }
+
+  if (!data.id) {
+    throw new Error('Town not found in MyHordes API');
   }
 
   // Parse API data
