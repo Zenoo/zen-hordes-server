@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.45](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.44...v1.0.45) (2026-09-08)
+
+
+### Bug Fixes
+
+* Catch invalid userkeys before checking for town existence ([3d50710](https://github.com/Zenoo/zen-hordes-server/commit/3d50710952658215929a619b1e9defc530c0b1fa))
+
 ## [1.0.44](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.43...v1.0.44) (2026-05-15)
 
 
