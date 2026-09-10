@@ -3,7 +3,7 @@ import { LOGGER } from '../context.js';
 import { Prisma, Town, Zone } from '../generated/prisma/client.js';
 import { Job, Locale, TownPhase, TownType } from '../generated/prisma/enums.js';
 import { ZoneCreateManyInput } from '../generated/prisma/models.js';
-import { checkApiAvailability } from './api/mh-api.helper.js';
+import { checkApiAvailability, handleApiErrors } from './api/mh-api.helper.js';
 import { Api, JSONGameObject } from './api/mh-api.js';
 import { updateCacheAfterHourlyUpdate } from './cache-update.js';
 import { ExpectedError } from './error.js';
@@ -80,16 +80,7 @@ export const updateCity = async (api: Api<unknown>, townId: number) => {
     `.replace(/\s+/g, ''),
   });
 
-  if ('error' in data) {
-    if (data.error === 'invalid_userkey') {
-      throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
-    }
-    if (data.error === 'UnknownMap') {
-      // Everyone died
-      throw new ExpectedError('This town died already', 410);
-    }
-    throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
-  }
+  handleApiErrors(data);
 
   if (data.city?.bank) {
     const bankItems = getBankItems(townId, data);
@@ -431,12 +422,7 @@ const createTownFromApi = async (api: Api<unknown>, id: number, userId: number) 
       )`.replace(/\s+/g, ''),
   });
 
-  if ('error' in data) {
-    if (data.error === 'invalid_userkey') {
-      throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
-    }
-    throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
-  }
+  handleApiErrors(data);
 
   if (!data.id) {
     throw new Error('Town not found in MyHordes API');

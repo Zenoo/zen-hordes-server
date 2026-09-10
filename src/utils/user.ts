@@ -1,7 +1,6 @@
 import { Locale } from '../generated/prisma/enums.js';
-import { checkApiAvailability } from './api/mh-api.helper.js';
+import { checkApiAvailability, handleApiErrors } from './api/mh-api.helper.js';
 import { Api } from './api/mh-api.js';
-import { ExpectedError } from './error.js';
 import { prisma } from './prisma.js';
 
 export const createUser = async (api: Api<unknown>, id: number, key: string) => {
@@ -21,12 +20,7 @@ export const createUser = async (api: Api<unknown>, id: number, key: string) => 
     fields: 'id,twinId,etwinId,name,locale,avatar',
   });
 
-  if ('error' in data) {
-    if (data.error === 'invalid_userkey') {
-      throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
-    }
-    throw new Error(`Error fetching user data from MyHordes API: ${data.error}`);
-  }
+  handleApiErrors(data);
 
   if (!data.id) {
     throw new Error('User not found in MyHordes API');

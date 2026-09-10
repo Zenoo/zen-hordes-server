@@ -28,3 +28,19 @@ export const checkApiAvailability = async (api: Api<unknown>) => {
     throw new ExpectedError('MyHordes API is currently unavailable', 503);
   }
 };
+
+export const handleApiErrors = (data: unknown) => {
+  if (typeof data === 'object' && data !== null && 'error' in data) {
+    if (data.error === 'invalid_userkey') {
+      throw new ExpectedError('Invalid userkey provided for MyHordes API', 401);
+    }
+    if (data.error === 'ApiDisabled') {
+      throw new ExpectedError('MyHordes API is disabled for this town', 403);
+    }
+    if (data.error === 'UnknownMap') {
+      // Everyone died
+      throw new ExpectedError('This town died already', 410);
+    }
+    throw new Error(`Error fetching town data from MyHordes API: ${data.error}`);
+  }
+};
