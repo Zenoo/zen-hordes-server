@@ -38,7 +38,7 @@ start_db() {
     local attempt=0
     
     while [ $attempt -lt $max_attempts ]; do
-        if docker compose -f docker-compose.test.yml exec -T postgres-test pg_isready -U test > /dev/null 2>&1; then
+        if docker compose -f docker-compose.test.yml exec -T postgres-test pg_isready -U postgres > /dev/null 2>&1; then
             print_info "Database is ready!"
             return 0
         fi
@@ -54,7 +54,7 @@ start_db() {
 run_migrations() {
     print_info "Running database migrations..."
     
-    export DATABASE_URL="postgresql://test:test@localhost:5433/zen_hordes_test"
+    export DATABASE_URL="postgresql://postgres:postgres@localhost:5433/zen_hordes_test"
     
     if pnpm prisma migrate deploy; then
         print_info "Migrations completed successfully!"

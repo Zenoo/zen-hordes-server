@@ -216,7 +216,7 @@ export const setup = async (): Promise<void> => {
       encoding: 'utf-8',
       env: {
         ...process.env,
-        DATABASE_URL: 'postgresql://test:test@localhost:5433/zen_hordes_test',
+        DATABASE_URL: 'postgresql://postgres:postgres@localhost:5433/zen_hordes_test',
       },
     });
     console.log(output);

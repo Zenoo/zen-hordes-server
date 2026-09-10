@@ -2,6 +2,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import request from 'supertest';
 import { createTestApp } from '../helpers/test-app.js';
 import { testPrisma } from '../setup.js';
+import { setCached } from '../../src/utils/cache.js';
+import { TownResponseType } from '../../src/routes/town.route.js';
+import { MapsResponseType } from '../../src/routes/maps.route.js';
 
 const mockGetJson = vi.fn();
 const mockGetJson2 = vi.fn();
@@ -56,7 +59,7 @@ describe('Update Route', () => {
           type: 'SMALL',
           bank: [],
           water: 0,
-          chaos: 0,
+          chaos: false,
           devast: false,
           door: false,
         },
@@ -284,31 +287,50 @@ describe('Update Route', () => {
 
   it('should update both town and town-map caches', async () => {
     // Pre-populate caches
-    const townCache = {
+    const townCache: TownResponseType = {
       success: true,
       town: {
         id: 100,
+        bank: [],
+        bonusPoints: 0,
+        catapultMasterId: null,
+        chaos: false,
+        custom: false,
+        devastated: false,
+        doorOpened: false,
+        guideId: null,
+        height: 10,
+        width: 10,
+        insurrected: false,
+        lastUpdate: null,
+        name: '',
+        pandemonium: false,
+        phase: '',
+        season: 0,
+        shamanId: null,
+        source: null,
+        start: '',
+        type: '',
+        waterInWell: 0,
+        x: 0,
+        y: 0,
         zones: [],
+        citizens: [{ userId: 1, x: 0, y: 0, dead: false, out: false, banned: false, name: '', job: null }],
       },
     };
-    const mapCache = {
+    const mapCache: MapsResponseType['towns'][number] = {
       id: 100,
       zones: [],
+      citizens: [{ userId: 1, x: 0, y: 0 }],
+      width: 10,
+      height: 10,
+      x: 0,
+      y: 0,
     };
 
     // Manually set caches (simulating previous requests)
-    vi.mock('../../src/utils/cache.js', async (importOriginal) => {
-      const actual = (await importOriginal()) as typeof import('../../src/utils/cache.js');
-      return {
-        ...actual,
-        getCached: vi.fn((key: string) => {
-          if (key === 'town:100') return townCache;
-          if (key === 'town-map:100') return mapCache;
-          return undefined;
-        }),
-        setCached: vi.fn(),
-      };
-    });
+    setCached('town:100', townCache);
+    setCached('town-map:100', mapCache);
 
     await request(app)
       .post('/update')
@@ -532,7 +554,7 @@ describe('Update Route', () => {
         city: {
           bank: [],
           water: 0,
-          chaos: 0,
+          chaos: false,
           devast: false,
           door: false,
         },
@@ -602,7 +624,7 @@ describe('Update Route', () => {
         city: {
           bank: [],
           water: 0,
-          chaos: 0,
+          chaos: false,
           devast: false,
           door: false,
         },

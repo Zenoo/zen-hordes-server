@@ -132,6 +132,6 @@ expect(response.body.success).toBe(true);
 - Uses tmpfs for fast in-memory storage
 - Container is automatically started before tests and cleaned up after
 - Uses the same schema as production (`prisma/schema.prisma`)
-- Connection string: `postgresql://test:test@localhost:5433/zen_hordes_test`
+- Connection string: `postgresql://postgres:postgres@localhost:5433/zen_hordes_test`
 - Automatically cleaned before each test to ensure isolation
 - Cleanup is guaranteed even if tests fail or are interrupted

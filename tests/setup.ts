@@ -4,7 +4,7 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 // Set the test database URL
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5433/zen_hordes_test';
+process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/zen_hordes_test';
 
 // Create a connection pool
 const pool = new Pool({
