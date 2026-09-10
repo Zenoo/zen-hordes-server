@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.47](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.46...v1.0.47) (2026-09-10)
+
+
+### Bug Fixes
+
+* Update deps + sanitize test suite ([a1a2f66](https://github.com/Zenoo/zen-hordes-server/commit/a1a2f660531b71d6c5039239e6e26a257647b473))
+
 ## [1.0.46](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.45...v1.0.46) (2026-09-10)
 
 
