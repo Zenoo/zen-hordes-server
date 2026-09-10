@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.46](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.45...v1.0.46) (2026-09-10)
+
+
+### Bug Fixes
+
+* Silence disabled API errors ([d171062](https://github.com/Zenoo/zen-hordes-server/commit/d171062200301a661aee85117e619f2cbd3da166))
+
 ## [1.0.45](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.44...v1.0.45) (2026-09-08)
 
 
