@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.48](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.47...v1.0.48) (2026-09-11)
+
+
+### Bug Fixes
+
+* Don't fail maps call on private town ([a945a9c](https://github.com/Zenoo/zen-hordes-server/commit/a945a9ced37c1659c6660cd3f5ae5010b5ba0172))
+
 ## [1.0.47](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.46...v1.0.47) (2026-09-10)
 
 
