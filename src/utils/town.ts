@@ -359,7 +359,13 @@ export const createOrUpdateTowns = async (api: Api<unknown>, ids: number[], user
       continue;
     }
 
-    results.push(await createTownFromApi(api, id, userId));
+    try {
+      results.push(await createTownFromApi(api, id, userId));
+    } catch (error) {
+      if (!(error instanceof ExpectedError)) {
+        LOGGER.error(`Failed to create town with id ${id}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
   }
 
   return results;
