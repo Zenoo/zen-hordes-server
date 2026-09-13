@@ -17,8 +17,8 @@ const requestSchema = registry.register(
     userId: z.number().openapi({ description: 'ID of the user' }),
     x: z.number().openapi({ description: 'X coordinate of the user' }),
     y: z.number().openapi({ description: 'Y coordinate of the user' }),
-    zombies: z.number().openapi({ description: 'Number of zombies in the zone' }),
-    depleted: z.boolean().openapi({ description: 'Indicates if the zone is depleted' }),
+    zombies: z.number().optional().openapi({ description: 'Number of zombies in the zone' }),
+    depleted: z.boolean().optional().openapi({ description: 'Indicates if the zone is depleted' }),
     buildingId: z.number().optional().openapi({ description: 'ID of the building in the zone, if any' }),
     scoutRadar: z
       .object({
@@ -46,6 +46,7 @@ const requestSchema = registry.register(
           broken: z.boolean().openapi({ description: 'Indicates if the item is broken' }),
         })
       )
+      .optional()
       .openapi({ description: 'List of items' }),
   })
 );
@@ -85,13 +86,16 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
     // Check if the user is actually in the town
     await checkUserInTown(api, data.townId, data.userId);
 
-    let dangerLevel = 0;
-    if (data.zombies > 5) {
-      dangerLevel = 3;
-    } else if (data.zombies > 2) {
-      dangerLevel = 2;
-    } else if (data.zombies > 0) {
-      dangerLevel = 1;
+    let dangerLevel: number | undefined;
+    if (typeof data.zombies !== 'undefined') {
+      dangerLevel = 0;
+      if (data.zombies > 5) {
+        dangerLevel = 3;
+      } else if (data.zombies > 2) {
+        dangerLevel = 2;
+      } else if (data.zombies > 0) {
+        dangerLevel = 1;
+      }
     }
 
     // Update current zone
@@ -114,11 +118,13 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
         buildingId: data.buildingId,
         updatedAt: new Date(),
         updatedById: user.id,
-        items: {
-          createMany: {
-            data: data.items,
-          },
-        },
+        items: data.items
+          ? {
+              createMany: {
+                data: data.items,
+              },
+            }
+          : undefined,
       },
       update: {
         zombies: data.zombies,
@@ -128,12 +134,14 @@ router.post('/', async (req: Request, res: Response<ResponseType | ErrorResponse
         buildingId: data.buildingId,
         updatedAt: new Date(),
         updatedById: user.id,
-        items: {
-          deleteMany: {},
-          createMany: {
-            data: data.items,
-          },
-        },
+        items: data.items
+          ? {
+              deleteMany: {},
+              createMany: {
+                data: data.items,
+              },
+            }
+          : undefined,
       },
     });
 

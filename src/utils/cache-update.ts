@@ -5,13 +5,16 @@ import { getCached, setCached } from './cache.js';
 export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
   const { townId, x, y, buildingId, depleted, zombies, items, userId } = data;
 
-  let dangerLevel = 0;
-  if (data.zombies > 5) {
-    dangerLevel = 3;
-  } else if (data.zombies > 2) {
-    dangerLevel = 2;
-  } else if (data.zombies > 0) {
-    dangerLevel = 1;
+  let dangerLevel: number | undefined;
+  if (typeof data.zombies !== 'undefined') {
+    dangerLevel = 0;
+    if (data.zombies > 5) {
+      dangerLevel = 3;
+    } else if (data.zombies > 2) {
+      dangerLevel = 2;
+    } else if (data.zombies > 0) {
+      dangerLevel = 1;
+    }
   }
 
   // Update town cache
@@ -20,19 +23,20 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
 
   if (townCached?.town) {
     const zoneIndex = townCached.town.zones.findIndex((z) => z.x === x && z.y === y);
+    const existingZone = zoneIndex !== -1 ? townCached.town.zones[zoneIndex] : null;
 
     // Update current zone
     const updatedZone = {
       x,
       y,
       visitedToday: true,
-      dangerLevel,
+      dangerLevel: dangerLevel ?? existingZone?.dangerLevel ?? null,
       buildingId: buildingId ?? null,
-      depleted,
-      zombies,
+      depleted: depleted ?? existingZone?.depleted ?? false,
+      zombies: zombies ?? existingZone?.zombies ?? null,
       updatedAt: new Date().toISOString(),
       updatedById: userId,
-      items,
+      items: items ?? existingZone?.items ?? [],
     };
 
     if (zoneIndex !== -1) {
@@ -78,13 +82,14 @@ export const updateCacheAfterUserUpdate = (data: UpdateRequestType): void => {
 
   if (mapCached) {
     const zoneIndex = mapCached.zones.findIndex((z) => z.x === x && z.y === y);
+    const existingMapZone = zoneIndex !== -1 ? mapCached.zones[zoneIndex] : null;
 
     const updatedMapZone = {
       x,
       y,
       visitedToday: true,
-      dangerLevel,
-      buildingId: buildingId ?? null,
+      dangerLevel: dangerLevel ?? existingMapZone?.dangerLevel ?? null,
+      buildingId: buildingId ?? existingMapZone?.buildingId ?? null,
     };
 
     if (zoneIndex !== -1) {
