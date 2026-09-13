@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.49](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.48...v1.0.49) (2026-09-13)
+
+
+### Bug Fixes
+
+* Partial zone update ([0f773ed](https://github.com/Zenoo/zen-hordes-server/commit/0f773ed613989d707e795814da3b0b648c387218))
+
 ## [1.0.48](https://github.com/Zenoo/zen-hordes-server/compare/v1.0.47...v1.0.48) (2026-09-11)
 
 
