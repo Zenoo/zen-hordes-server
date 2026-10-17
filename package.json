@@ -48,7 +48,7 @@
     "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
-    "compression": "^1.8.1",
+    "compression": "^1.8.2",
     "cors": "^2.8.6",
     "dayjs": "^1.11.23",
     "discord.js": "^14.27.0",
