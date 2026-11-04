@@ -59,7 +59,7 @@
     "node-cache": "^5.1.2",
     "pg": "^8.23.0",
     "swagger-ui-express": "^5.0.1",
-    "zod": "^4.6.1"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.3",
